@@ -114,7 +114,8 @@ const state = {
     currentWord: "",
     outerOrder: [],
     view: "play",
-    rankDetailOpen: false
+    rankDetailOpen: false,
+    puzzleSelectOpen: false
 };
 
 const elements = {
@@ -122,7 +123,11 @@ const elements = {
     playPanel: document.getElementById("playPanel"),
     createPanel: document.getElementById("createPanel"),
     effectsLayer: document.getElementById("effectsLayer"),
+    puzzleSelectWrap: document.getElementById("puzzleSelectWrap"),
     puzzleSelect: document.getElementById("puzzleSelect"),
+    puzzleSelectButton: document.getElementById("puzzleSelectButton"),
+    puzzleSelectCurrent: document.getElementById("puzzleSelectCurrent"),
+    puzzleSelectMenu: document.getElementById("puzzleSelectMenu"),
     resetProgressButton: document.getElementById("resetProgressButton"),
     playLetters: document.getElementById("playLetters"),
     playLetterTiles: [...document.querySelectorAll("#playLetters .mini-hex")],
@@ -370,6 +375,7 @@ function setActivePuzzle(puzzleId) {
     state.currentWord = "";
     state.outerOrder = getOuterLetters(nextPuzzle);
     state.rankDetailOpen = false;
+    state.puzzleSelectOpen = false;
     localStorage.setItem(STORAGE_KEYS.activePuzzle, nextPuzzle.id);
     setStatus("Every word must use the center letter and stay inside the pangram.", "neutral");
     renderPlay();
@@ -402,6 +408,15 @@ function closeRankMenu() {
     renderStats();
 }
 
+function closePuzzleSelectMenu() {
+    if (!state.puzzleSelectOpen) {
+        return;
+    }
+
+    state.puzzleSelectOpen = false;
+    renderPuzzleSelect();
+}
+
 function getViewFromHash() {
     return window.location.hash === "#create" ? "create" : "play";
 }
@@ -409,6 +424,7 @@ function getViewFromHash() {
 function setView(nextView) {
     state.view = nextView === "create" ? "create" : "play";
     state.rankDetailOpen = false;
+    state.puzzleSelectOpen = false;
     const nextHash = state.view === "create" ? "#create" : "#play";
     if (window.location.hash !== nextHash) {
         history.replaceState(null, "", nextHash);
@@ -471,15 +487,37 @@ function renderTabs() {
 function renderPuzzleSelect() {
     const currentValue = state.activePuzzleId;
     elements.puzzleSelect.innerHTML = "";
+    elements.puzzleSelectMenu.innerHTML = "";
 
     state.puzzles.forEach((puzzle) => {
         const option = document.createElement("option");
+        const label = getPuzzleDisplayLabel(puzzle);
         option.value = puzzle.id;
-        option.textContent = getPuzzleDisplayLabel(puzzle);
+        option.textContent = label;
         elements.puzzleSelect.append(option);
+
+        const optionButton = document.createElement("button");
+        optionButton.type = "button";
+        optionButton.className = "select-option";
+        optionButton.setAttribute("role", "option");
+        optionButton.dataset.value = puzzle.id;
+        optionButton.textContent = label;
+        const isActive = puzzle.id === currentValue;
+        optionButton.classList.toggle("is-active", isActive);
+        optionButton.setAttribute("aria-selected", String(isActive));
+        optionButton.addEventListener("click", () => {
+            setActivePuzzle(puzzle.id);
+            closePuzzleSelectMenu();
+        });
+        elements.puzzleSelectMenu.append(optionButton);
     });
 
     elements.puzzleSelect.value = currentValue;
+    const activePuzzle = state.puzzles.find((puzzle) => puzzle.id === currentValue) || state.puzzles[0] || null;
+    elements.puzzleSelectCurrent.textContent = activePuzzle ? getPuzzleDisplayLabel(activePuzzle) : "Choose pangram";
+    elements.puzzleSelectButton.setAttribute("aria-expanded", String(state.puzzleSelectOpen));
+    elements.puzzleSelectMenu.hidden = !state.puzzleSelectOpen;
+    elements.puzzleSelectWrap.classList.toggle("is-open", state.puzzleSelectOpen);
 }
 
 function renderWordDisplay() {
@@ -992,7 +1030,8 @@ function shouldIgnoreKeydown(event) {
 
     const tagName = activeElement.tagName;
     const isEditable = activeElement.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(tagName);
-    return isEditable || state.view !== "play";
+    const isPuzzlePickerFocused = !!(elements.puzzleSelectWrap && elements.puzzleSelectWrap.contains(activeElement));
+    return isEditable || isPuzzlePickerFocused || state.view !== "play";
 }
 
 function handleKeyboard(event) {
@@ -1034,6 +1073,10 @@ function attachEvents() {
     elements.puzzleSelect.addEventListener("change", (event) => {
         setActivePuzzle(event.target.value);
     });
+    elements.puzzleSelectButton.addEventListener("click", () => {
+        state.puzzleSelectOpen = !state.puzzleSelectOpen;
+        renderPuzzleSelect();
+    });
 
     elements.playBoardButtons.forEach((button) => {
         button.addEventListener("click", () => {
@@ -1052,22 +1095,24 @@ function attachEvents() {
     elements.creatorForm.addEventListener("submit", saveCreatorPuzzle);
     elements.clearCreatorButton.addEventListener("click", clearCreatorForm);
     document.addEventListener("click", (event) => {
-        if (!state.rankDetailOpen) {
-            return;
+        if (state.rankDetailOpen && !elements.rankDropdown.contains(event.target)) {
+            closeRankMenu();
         }
 
-        if (!elements.rankDropdown.contains(event.target)) {
-            closeRankMenu();
+        if (state.puzzleSelectOpen && !elements.puzzleSelectWrap.contains(event.target)) {
+            closePuzzleSelectMenu();
         }
     });
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
             closeRankMenu();
+            closePuzzleSelectMenu();
         }
     });
     window.addEventListener("hashchange", () => {
         state.view = getViewFromHash();
         state.rankDetailOpen = false;
+        state.puzzleSelectOpen = false;
         renderTabs();
     });
     document.addEventListener("keydown", handleKeyboard);

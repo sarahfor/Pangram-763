@@ -32,10 +32,22 @@
                                 <h2 id="playHeading">Play a pangram</h2>
                             </div>
                             <div class="play-tools">
-                                <label class="field compact">
+                                <div class="field compact custom-select" id="puzzleSelectWrap">
                                     <span>Choose pangram</span>
-                                    <select id="puzzleSelect" aria-label="Choose pangram"></select>
-                                </label>
+                                    <select id="puzzleSelect" class="native-select-hidden" aria-label="Choose pangram"></select>
+                                    <button
+                                        class="select-trigger"
+                                        id="puzzleSelectButton"
+                                        type="button"
+                                        aria-haspopup="listbox"
+                                        aria-expanded="false"
+                                        aria-controls="puzzleSelectMenu"
+                                    >
+                                        <span id="puzzleSelectCurrent">Choose pangram</span>
+                                        <span class="select-trigger-caret" aria-hidden="true">▾</span>
+                                    </button>
+                                    <div class="select-menu" id="puzzleSelectMenu" role="listbox" hidden></div>
+                                </div>
                                 <button class="subtle-button" id="resetProgressButton" type="button">Clear progress</button>
                             </div>
                         </div>
