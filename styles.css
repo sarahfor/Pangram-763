@@ -1201,68 +1201,8 @@ button.hex-center:focus-visible {
     line-height: 1.4;
 }
 
-.mobile-found-button {
-    width: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    border: 1px solid rgba(196, 153, 23, 0.14);
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.78);
-    color: var(--ink);
-    padding: 12px 14px;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.82),
-        0 8px 18px rgba(55, 40, 10, 0.05);
-}
-
-.mobile-found-button-copy {
-    display: grid;
-    gap: 3px;
-    justify-items: start;
-    text-align: left;
-}
-
-.mobile-found-button-copy strong {
-    font-size: 0.96rem;
-    line-height: 1.1;
-}
-
-.mobile-found-button-copy span {
-    color: var(--muted);
-    font-size: 0.82rem;
-    line-height: 1.35;
-}
-
-.mobile-found-caret {
-    color: var(--ink);
-    font-size: 1.02rem;
-    transition: transform 0.2s ease;
-}
-
-.mobile-found-button[aria-expanded="true"] .mobile-found-caret {
-    transform: rotate(180deg);
-}
-
-.mobile-sheet-backdrop {
-    display: none;
-}
-
 .mobile-found-panel {
     display: none;
-}
-
-.mobile-found-panel[hidden] {
-    display: none;
-}
-
-.mobile-sheet-handle {
-    width: 52px;
-    height: 5px;
-    margin: 0 auto 14px;
-    border-radius: 999px;
-    background: rgba(111, 102, 92, 0.22);
 }
 
 .mobile-found-panel-header {
@@ -1273,22 +1213,23 @@ button.hex-center:focus-visible {
     margin-bottom: 16px;
 }
 
-.mobile-found-close {
-    border: 1px solid rgba(93, 71, 33, 0.12);
+.mobile-found-count {
+    min-width: 38px;
+    height: 38px;
+    display: inline-grid;
+    place-items: center;
+    align-self: center;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.82);
+    background: linear-gradient(180deg, rgba(255, 222, 88, 0.94), rgba(247, 207, 57, 0.78));
     color: var(--ink);
-    padding: 10px 14px;
-    font-weight: 700;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    font-weight: 800;
+    box-shadow: 0 10px 18px rgba(226, 179, 0, 0.14);
 }
 
 .mobile-found-words {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    max-height: min(52svh, 420px);
-    overflow: auto;
     padding-right: 2px;
 }
 
@@ -1560,9 +1501,19 @@ button.hex-center:focus-visible {
         align-items: center;
     }
 
-    .mobile-found-button {
-        flex: 0 0 auto;
-        max-width: 46%;
+    .mobile-found-panel {
+        display: block;
+        margin-top: 14px;
+        padding: 16px 14px;
+        border: 1px solid rgba(196, 153, 23, 0.14);
+        border-radius: 24px;
+        background:
+            linear-gradient(180deg, rgba(255, 252, 246, 0.98), rgba(248, 241, 228, 0.94)),
+            radial-gradient(circle at top, rgba(255, 255, 255, 0.28), transparent 44%);
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.8),
+            0 16px 28px rgba(55, 40, 10, 0.06);
+        scroll-margin-top: 18px;
     }
 
     .play-stage {
@@ -1608,42 +1559,8 @@ button.hex-center:focus-visible {
         min-height: 54px;
     }
 
-    .mobile-sheet-backdrop {
-        position: fixed;
-        inset: 0;
-        z-index: 34;
-        display: block;
-        background: rgba(24, 20, 16, 0.24);
-        backdrop-filter: blur(6px);
-    }
-
-    .mobile-sheet-backdrop[hidden] {
-        display: none;
-    }
-
-    .mobile-found-panel {
-        position: fixed;
-        left: 12px;
-        right: 12px;
-        bottom: calc(12px + var(--safe-bottom));
-        z-index: 35;
-        display: block;
-        max-height: min(68svh, 560px);
-        padding: 14px 14px 16px;
-        border: 1px solid rgba(196, 153, 23, 0.16);
-        border-radius: 28px;
-        background:
-            linear-gradient(180deg, rgba(255, 252, 246, 0.995), rgba(248, 241, 228, 0.98)),
-            radial-gradient(circle at top, rgba(255, 255, 255, 0.38), transparent 42%);
-        box-shadow: 0 28px 60px rgba(55, 40, 10, 0.22);
-    }
-
     .field-grid {
         grid-template-columns: 1fr;
-    }
-
-    body.mobile-sheet-open {
-        overflow: hidden;
     }
 }
 
@@ -1699,31 +1616,6 @@ button.hex-center:focus-visible {
         font-size: 1.34rem;
     }
 
-    .mobile-found-button {
-        max-width: 48%;
-        padding: 10px 12px;
-        border-radius: 18px;
-    }
-
-    .mobile-found-button-copy {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .mobile-found-button-copy strong {
-        font-size: 0.88rem;
-    }
-
-    .mobile-found-button-copy span {
-        font-size: 0.72rem;
-        line-height: 1;
-        padding: 5px 7px;
-        border-radius: 999px;
-        background: rgba(247, 207, 57, 0.18);
-        color: var(--info);
-    }
-
     .entry-card {
         padding: 10px 10px 8px;
     }
@@ -1764,11 +1656,14 @@ button.hex-center:focus-visible {
     }
 
     .mobile-found-panel {
-        left: 8px;
-        right: 8px;
-        bottom: calc(8px + var(--safe-bottom));
-        padding: 12px 12px 14px;
-        border-radius: 24px;
+        margin-top: 12px;
+        padding: 14px 12px;
+        border-radius: 22px;
+    }
+
+    .mobile-found-count {
+        min-width: 34px;
+        height: 34px;
     }
 
     .saved-pangram-actions {

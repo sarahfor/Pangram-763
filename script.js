@@ -115,8 +115,7 @@ const state = {
     outerOrder: [],
     view: "play",
     rankDetailOpen: false,
-    puzzleSelectOpen: false,
-    mobileWordsOpen: false
+    puzzleSelectOpen: false
 };
 
 const elements = {
@@ -143,11 +142,8 @@ const elements = {
     mobileScoreValue: document.getElementById("mobileScoreValue"),
     mobileProgressBar: document.getElementById("mobileProgressBar"),
     mobileProgressNote: document.getElementById("mobileProgressNote"),
-    mobileFoundButton: document.getElementById("mobileFoundButton"),
     mobileFoundCount: document.getElementById("mobileFoundCount"),
-    mobileFoundBackdrop: document.getElementById("mobileFoundBackdrop"),
     mobileFoundPanel: document.getElementById("mobileFoundPanel"),
-    mobileFoundCloseButton: document.getElementById("mobileFoundCloseButton"),
     mobileFoundWords: document.getElementById("mobileFoundWords"),
     wordsFoundValue: document.getElementById("wordsFoundValue"),
     scoreValue: document.getElementById("scoreValue"),
@@ -387,8 +383,6 @@ function setActivePuzzle(puzzleId) {
     state.outerOrder = getOuterLetters(nextPuzzle);
     state.rankDetailOpen = false;
     state.puzzleSelectOpen = false;
-    state.mobileWordsOpen = false;
-    document.body.classList.remove("mobile-sheet-open");
     localStorage.setItem(STORAGE_KEYS.activePuzzle, nextPuzzle.id);
     setStatus("Every word must use the center letter and stay inside the pangram.", "neutral");
     renderPlay();
@@ -430,15 +424,6 @@ function closePuzzleSelectMenu() {
     renderPuzzleSelect();
 }
 
-function closeMobileWordsSheet() {
-    if (!state.mobileWordsOpen) {
-        return;
-    }
-
-    state.mobileWordsOpen = false;
-    renderStats();
-}
-
 function getViewFromHash() {
     return window.location.hash === "#create" ? "create" : "play";
 }
@@ -447,8 +432,6 @@ function setView(nextView) {
     state.view = nextView === "create" ? "create" : "play";
     state.rankDetailOpen = false;
     state.puzzleSelectOpen = false;
-    state.mobileWordsOpen = false;
-    document.body.classList.remove("mobile-sheet-open");
     const nextHash = state.view === "create" ? "#create" : "#play";
     if (window.location.hash !== nextHash) {
         history.replaceState(null, "", nextHash);
@@ -643,16 +626,9 @@ function renderStats() {
     if (elements.mobileFoundCount) {
         elements.mobileFoundCount.textContent = String(foundWords.length);
     }
-    if (elements.mobileFoundButton) {
-        elements.mobileFoundButton.setAttribute("aria-expanded", String(state.mobileWordsOpen));
-    }
     if (elements.mobileFoundPanel) {
-        elements.mobileFoundPanel.hidden = !state.mobileWordsOpen;
+        elements.mobileFoundPanel.hidden = false;
     }
-    if (elements.mobileFoundBackdrop) {
-        elements.mobileFoundBackdrop.hidden = !state.mobileWordsOpen;
-    }
-    document.body.classList.toggle("mobile-sheet-open", state.mobileWordsOpen);
     elements.rankCard.setAttribute("aria-expanded", String(state.rankDetailOpen));
     elements.rankDetail.textContent = rankDetails.nextRank
         ? `${rankDetails.pointsToNext} point${rankDetails.pointsToNext === 1 ? "" : "s"} to ${rankDetails.nextRank}`
@@ -1157,18 +1133,6 @@ function attachEvents() {
     elements.deleteButton.addEventListener("click", deleteLetter);
     elements.shuffleButton.addEventListener("click", shuffleOuterLetters);
     elements.enterButton.addEventListener("click", submitWord);
-    if (elements.mobileFoundButton) {
-        elements.mobileFoundButton.addEventListener("click", () => {
-            state.mobileWordsOpen = !state.mobileWordsOpen;
-            renderStats();
-        });
-    }
-    if (elements.mobileFoundCloseButton) {
-        elements.mobileFoundCloseButton.addEventListener("click", closeMobileWordsSheet);
-    }
-    if (elements.mobileFoundBackdrop) {
-        elements.mobileFoundBackdrop.addEventListener("click", closeMobileWordsSheet);
-    }
     elements.resetProgressButton.addEventListener("click", clearCurrentProgress);
     elements.rankCard.addEventListener("click", () => {
         state.rankDetailOpen = !state.rankDetailOpen;
@@ -1184,30 +1148,17 @@ function attachEvents() {
         if (state.puzzleSelectOpen && !elements.puzzleSelectWrap.contains(event.target)) {
             closePuzzleSelectMenu();
         }
-
-        if (
-            state.mobileWordsOpen &&
-            elements.mobileFoundPanel &&
-            elements.mobileFoundButton &&
-            !elements.mobileFoundPanel.contains(event.target) &&
-            !elements.mobileFoundButton.contains(event.target)
-        ) {
-            closeMobileWordsSheet();
-        }
     });
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
             closeRankMenu();
             closePuzzleSelectMenu();
-            closeMobileWordsSheet();
         }
     });
     window.addEventListener("hashchange", () => {
         state.view = getViewFromHash();
         state.rankDetailOpen = false;
         state.puzzleSelectOpen = false;
-        state.mobileWordsOpen = false;
-        document.body.classList.remove("mobile-sheet-open");
         renderTabs();
     });
     document.addEventListener("keydown", handleKeyboard);
