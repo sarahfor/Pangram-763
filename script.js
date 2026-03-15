@@ -54,6 +54,18 @@ const DEFAULT_PUZZLES = [
             "tears",
             "psalter"
         ]
+    },
+    {
+        id: "schedule-cdehlsu",
+        title: "Schedule",
+        letters: ["c", "d", "e", "h", "l", "s", "u"],
+        center: "e"
+    },
+    {
+        id: "gymnasts-agmnsty",
+        title: "Gymnasts",
+        letters: ["a", "g", "m", "n", "s", "t", "y"],
+        center: "g"
     }
 ];
 
@@ -162,6 +174,12 @@ function generateWordsForPangram(letters, center) {
     GENERATED_WORDS_CACHE.set(key, matchingWords);
     return matchingWords;
 }
+
+DEFAULT_PUZZLES.forEach((puzzle) => {
+    if (!Array.isArray(puzzle.words)) {
+        puzzle.words = generateWordsForPangram(puzzle.letters, puzzle.center);
+    }
+});
 
 function normalizeCustomPuzzleTitle(title, index) {
     if (typeof title !== "string" || !title.trim()) {
