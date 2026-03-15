@@ -52,6 +52,34 @@
                             </div>
                         </div>
 
+                        <section class="mobile-hud" aria-label="Mobile game progress">
+                            <div class="mobile-progress-card">
+                                <div class="mobile-progress-top">
+                                    <div class="mobile-rank-block">
+                                        <strong id="mobileRankValue">Beginner</strong>
+                                        <span id="mobileScoreValue">0 points</span>
+                                    </div>
+                                    <button
+                                        class="mobile-found-button"
+                                        id="mobileFoundButton"
+                                        type="button"
+                                        aria-expanded="false"
+                                        aria-controls="mobileFoundPanel"
+                                    >
+                                        <span class="mobile-found-button-copy">
+                                            <strong>Words found</strong>
+                                            <span id="mobileFoundCount">0</span>
+                                        </span>
+                                        <span class="mobile-found-caret" aria-hidden="true">▾</span>
+                                    </button>
+                                </div>
+                                <div class="mobile-progress-track" aria-hidden="true">
+                                    <span class="mobile-progress-bar" id="mobileProgressBar"></span>
+                                </div>
+                                <p class="mobile-progress-note" id="mobileProgressNote">0 points to Good Start</p>
+                            </div>
+                        </section>
+
                         <div class="play-stage">
                             <div class="entry-card">
                                 <div class="entry-display" id="wordDisplay" aria-live="polite">
@@ -80,6 +108,19 @@
                                 <button class="action-button solid" id="enterButton" type="button">Enter</button>
                             </div>
                         </div>
+
+                        <div class="mobile-sheet-backdrop" id="mobileFoundBackdrop" hidden></div>
+                        <section class="mobile-found-panel" id="mobileFoundPanel" aria-label="Words found" hidden>
+                            <div class="mobile-sheet-handle" aria-hidden="true"></div>
+                            <div class="mobile-found-panel-header">
+                                <div>
+                                    <p class="section-label">Words found</p>
+                                    <h3>Correct guesses</h3>
+                                </div>
+                                <button class="mobile-found-close" id="mobileFoundCloseButton" type="button">Done</button>
+                            </div>
+                            <div class="mobile-found-words" id="mobileFoundWords"></div>
+                        </section>
                     </section>
 
                     <aside class="score-panel">

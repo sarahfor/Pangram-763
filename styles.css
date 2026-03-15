@@ -1134,6 +1134,164 @@ button.hex-center:focus-visible {
     gap: 12px;
 }
 
+.mobile-hud {
+    display: none;
+}
+
+.mobile-progress-card {
+    border: 1px solid rgba(196, 153, 23, 0.14);
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(255, 252, 246, 0.96), rgba(248, 241, 228, 0.92));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.78),
+        0 12px 24px rgba(55, 40, 10, 0.05);
+    padding: 16px 18px 14px;
+}
+
+.mobile-progress-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.mobile-rank-block {
+    display: grid;
+    gap: 4px;
+}
+
+.mobile-rank-block strong {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.65rem;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+}
+
+.mobile-rank-block span {
+    color: var(--muted);
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.mobile-progress-track {
+    position: relative;
+    margin-top: 14px;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(111, 102, 92, 0.1);
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(55, 40, 10, 0.08);
+}
+
+.mobile-progress-bar {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--center), #f29f05);
+    transition: width 0.28s ease;
+}
+
+.mobile-progress-note {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.4;
+}
+
+.mobile-found-button {
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    border: 1px solid rgba(196, 153, 23, 0.14);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--ink);
+    padding: 12px 14px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.82),
+        0 8px 18px rgba(55, 40, 10, 0.05);
+}
+
+.mobile-found-button-copy {
+    display: grid;
+    gap: 3px;
+    justify-items: start;
+    text-align: left;
+}
+
+.mobile-found-button-copy strong {
+    font-size: 0.96rem;
+    line-height: 1.1;
+}
+
+.mobile-found-button-copy span {
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
+.mobile-found-caret {
+    color: var(--ink);
+    font-size: 1.02rem;
+    transition: transform 0.2s ease;
+}
+
+.mobile-found-button[aria-expanded="true"] .mobile-found-caret {
+    transform: rotate(180deg);
+}
+
+.mobile-sheet-backdrop {
+    display: none;
+}
+
+.mobile-found-panel {
+    display: none;
+}
+
+.mobile-found-panel[hidden] {
+    display: none;
+}
+
+.mobile-sheet-handle {
+    width: 52px;
+    height: 5px;
+    margin: 0 auto 14px;
+    border-radius: 999px;
+    background: rgba(111, 102, 92, 0.22);
+}
+
+.mobile-found-panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.mobile-found-close {
+    border: 1px solid rgba(93, 71, 33, 0.12);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.82);
+    color: var(--ink);
+    padding: 10px 14px;
+    font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.mobile-found-words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-height: min(52svh, 420px);
+    overflow: auto;
+    padding-right: 2px;
+}
+
 .word-chip,
 .empty-state {
     border-radius: 999px;
@@ -1300,9 +1458,18 @@ button.hex-center:focus-visible {
         margin-bottom: calc(28px + var(--safe-bottom));
     }
 
+    .topbar {
+        margin-bottom: 14px;
+        padding: 0 2px;
+    }
+
+    .storage-pill {
+        display: none;
+    }
+
     .panel {
-        padding: 16px;
-        border-radius: 28px;
+        padding: 12px;
+        border-radius: 26px;
     }
 
     .board-panel,
@@ -1311,12 +1478,17 @@ button.hex-center:focus-visible {
     .preview-card,
     .saved-card {
         padding: 16px;
-        border-radius: 22px;
+        border-radius: 24px;
+    }
+
+    .score-panel {
+        display: none;
     }
 
     .tab-bar {
         display: flex;
         width: 100%;
+        margin-bottom: 16px;
     }
 
     .tab-button {
@@ -1330,22 +1502,21 @@ button.hex-center:focus-visible {
     }
 
     .board-panel {
-        top: calc(var(--safe-top) + 8px);
-        gap: 14px;
+        position: relative;
+        top: auto;
+        gap: 12px;
         padding: 14px;
-        border-radius: 22px;
+        border-radius: 24px;
     }
 
-    .play-stage {
-        gap: 14px;
-        padding: 14px;
-        border-radius: 26px;
+    .board-panel .panel-heading > div:first-child {
+        display: none;
     }
 
     .play-tools {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
-        align-items: end;
+        align-items: center;
         gap: 10px;
         justify-content: stretch;
     }
@@ -1355,44 +1526,124 @@ button.hex-center:focus-visible {
         width: 100%;
     }
 
-    .play-tools .subtle-button {
-        width: auto;
+    .play-tools .field.compact > span {
+        display: none;
+    }
+
+    #puzzleSelectCurrent {
+        display: block;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-    .entry-display {
-        min-height: clamp(72px, 14svh, 88px);
-        padding-left: 14px;
-        border-left-width: 3px;
-        font-size: clamp(1.7rem, 9vw, 3.1rem);
+    .select-trigger {
+        min-height: 50px;
+        padding: 12px 14px;
+        border-radius: 18px;
     }
 
-    .mini-pangram-board {
-        --hex-width: 3.75rem;
-        --hex-height: 3.18rem;
-        margin-top: -4px;
+    .play-tools .subtle-button {
+        width: auto;
+        min-height: 50px;
+        padding: 10px 14px;
+        white-space: nowrap;
+    }
+
+    .mobile-hud {
+        display: block;
+    }
+
+    .mobile-progress-top {
+        gap: 12px;
+        align-items: center;
+    }
+
+    .mobile-found-button {
+        flex: 0 0 auto;
+        max-width: 46%;
+    }
+
+    .play-stage {
+        gap: 12px;
+        padding: 16px 14px 14px;
+        border-radius: 24px;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.86),
+            0 18px 28px rgba(55, 40, 10, 0.07);
+    }
+
+    .entry-display {
+        min-height: 66px;
+        padding-left: 14px;
+        border-left-width: 3px;
+        font-size: clamp(1.7rem, 8.6vw, 2.8rem);
+    }
+
+    .status-message.is-neutral {
+        display: none;
     }
 
     .pangram-board {
-        --hex-width: clamp(5.4rem, 11.7vw, 7.2rem);
-    }
-
-    .pangram-board-small {
-        --hex-width: clamp(3.2rem, 5vw, 4.55rem);
+        --hex-width: clamp(4.9rem, 17vw, 5.95rem);
+        margin-top: -2px;
     }
 
     .control-row {
-        gap: 10px;
+        gap: 8px;
         padding: 6px;
+        width: 100%;
     }
 
     .action-button {
-        padding: 0 16px;
-        min-height: 56px;
+        padding: 0 14px;
+        min-height: 54px;
+        font-size: 1rem;
+    }
+
+    .shuffle-button {
+        width: 58px;
+        min-width: 58px;
+        min-height: 54px;
+    }
+
+    .mobile-sheet-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 34;
+        display: block;
+        background: rgba(24, 20, 16, 0.24);
+        backdrop-filter: blur(6px);
+    }
+
+    .mobile-sheet-backdrop[hidden] {
+        display: none;
+    }
+
+    .mobile-found-panel {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        bottom: calc(12px + var(--safe-bottom));
+        z-index: 35;
+        display: block;
+        max-height: min(68svh, 560px);
+        padding: 14px 14px 16px;
+        border: 1px solid rgba(196, 153, 23, 0.16);
+        border-radius: 28px;
+        background:
+            linear-gradient(180deg, rgba(255, 252, 246, 0.995), rgba(248, 241, 228, 0.98)),
+            radial-gradient(circle at top, rgba(255, 255, 255, 0.38), transparent 42%);
+        box-shadow: 0 28px 60px rgba(55, 40, 10, 0.22);
     }
 
     .field-grid {
         grid-template-columns: 1fr;
+    }
+
+    body.mobile-sheet-open {
+        overflow: hidden;
     }
 }
 
@@ -1414,12 +1665,7 @@ button.hex-center:focus-visible {
     }
 
     h1 {
-        font-size: 2.3rem;
-    }
-
-    .storage-pill {
-        width: 100%;
-        text-align: center;
+        font-size: 2.05rem;
     }
 
     .tab-bar {
@@ -1437,21 +1683,49 @@ button.hex-center:focus-visible {
     }
 
     .play-tools {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr) auto;
     }
 
     .play-tools .subtle-button {
-        width: 100%;
+        width: auto;
+        min-width: 112px;
     }
 
-    .entry-card {
+    .mobile-progress-card {
         padding: 12px 12px 10px;
     }
 
-    .mini-pangram-board {
-        --hex-width: 3rem;
-        --hex-height: 2.55rem;
-        margin-top: -2px;
+    .mobile-rank-block strong {
+        font-size: 1.34rem;
+    }
+
+    .mobile-found-button {
+        max-width: 48%;
+        padding: 10px 12px;
+        border-radius: 18px;
+    }
+
+    .mobile-found-button-copy {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .mobile-found-button-copy strong {
+        font-size: 0.88rem;
+    }
+
+    .mobile-found-button-copy span {
+        font-size: 0.72rem;
+        line-height: 1;
+        padding: 5px 7px;
+        border-radius: 999px;
+        background: rgba(247, 207, 57, 0.18);
+        color: var(--info);
+    }
+
+    .entry-card {
+        padding: 10px 10px 8px;
     }
 
     .rank-menu {
@@ -1466,15 +1740,11 @@ button.hex-center:focus-visible {
     }
 
     .pangram-board {
-        --hex-width: clamp(4.5rem, 14.4vw, 5.67rem);
-    }
-
-    .pangram-board-small {
-        --hex-width: clamp(2.9rem, 5vw, 3.95rem);
+        --hex-width: clamp(4.45rem, 19vw, 5.05rem);
     }
 
     .hex {
-        font-size: clamp(1.4rem, 5.8vw, 1.7rem);
+        font-size: clamp(1.5rem, 6vw, 1.82rem);
     }
 
     .control-row {
@@ -1491,6 +1761,14 @@ button.hex-center:focus-visible {
     .action-button {
         padding: 0 10px;
         font-size: 0.92rem;
+    }
+
+    .mobile-found-panel {
+        left: 8px;
+        right: 8px;
+        bottom: calc(8px + var(--safe-bottom));
+        padding: 12px 12px 14px;
+        border-radius: 24px;
     }
 
     .saved-pangram-actions {
