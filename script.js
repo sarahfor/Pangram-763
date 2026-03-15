@@ -697,7 +697,7 @@ function renderFoundWordList(container, foundWords, puzzle, emptyMessage) {
     }
 
     [...foundWords]
-        .reverse()
+        .sort((left, right) => left.localeCompare(right))
         .forEach((word) => {
             const chip = document.createElement("div");
             chip.className = "word-chip";
@@ -911,7 +911,7 @@ function submitWord() {
     }
 
     if (!puzzle.words.includes(word)) {
-        completeSubmission("That word is not in this pangram.", "error");
+        completeSubmission("This is not a word", "error");
         return;
     }
 
