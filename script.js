@@ -115,7 +115,8 @@ const state = {
     outerOrder: [],
     view: "play",
     rankDetailOpen: false,
-    puzzleSelectOpen: false
+    puzzleSelectOpen: false,
+    mobileWordsOpen: false
 };
 
 const elements = {
@@ -129,6 +130,17 @@ const elements = {
     puzzleSelectCurrent: document.getElementById("puzzleSelectCurrent"),
     puzzleSelectMenu: document.getElementById("puzzleSelectMenu"),
     resetProgressButton: document.getElementById("resetProgressButton"),
+    mobileRankValue: document.getElementById("mobileRankValue"),
+    mobileRankMeta: document.getElementById("mobileRankMeta"),
+    mobileScoreBubble: document.getElementById("mobileScoreBubble"),
+    mobileProgressFill: document.getElementById("mobileProgressFill"),
+    mobileNextRank: document.getElementById("mobileNextRank"),
+    mobileFoundToggle: document.getElementById("mobileFoundToggle"),
+    mobileFoundSummary: document.getElementById("mobileFoundSummary"),
+    mobileFoundPanel: document.getElementById("mobileFoundPanel"),
+    mobileWordsCount: document.getElementById("mobileWordsCount"),
+    mobilePangramSummary: document.getElementById("mobilePangramSummary"),
+    mobileFoundWords: document.getElementById("mobileFoundWords"),
     playLetters: document.getElementById("playLetters"),
     playLetterTiles: [...document.querySelectorAll("#playLetters .mini-hex")],
     wordDisplay: document.getElementById("wordDisplay"),
@@ -376,6 +388,7 @@ function setActivePuzzle(puzzleId) {
     state.outerOrder = getOuterLetters(nextPuzzle);
     state.rankDetailOpen = false;
     state.puzzleSelectOpen = false;
+    state.mobileWordsOpen = false;
     localStorage.setItem(STORAGE_KEYS.activePuzzle, nextPuzzle.id);
     setStatus("Every word must use the center letter and stay inside the pangram.", "neutral");
     renderPlay();
@@ -425,6 +438,7 @@ function setView(nextView) {
     state.view = nextView === "create" ? "create" : "play";
     state.rankDetailOpen = false;
     state.puzzleSelectOpen = false;
+    state.mobileWordsOpen = false;
     const nextHash = state.view === "create" ? "#create" : "#play";
     if (window.location.hash !== nextHash) {
         history.replaceState(null, "", nextHash);
@@ -610,6 +624,20 @@ function renderStats() {
     elements.rankMenu.hidden = !state.rankDetailOpen;
     elements.rankDropdown.classList.toggle("is-open", state.rankDetailOpen);
     elements.rankBreakdown.innerHTML = "";
+    elements.mobileRankValue.textContent = rankDetails.currentRank;
+    elements.mobileRankMeta.textContent = `${currentScore} point${currentScore === 1 ? "" : "s"}`;
+    elements.mobileScoreBubble.textContent = String(currentScore);
+    elements.mobileProgressFill.style.width = `${progress}%`;
+    elements.mobileNextRank.textContent = rankDetails.nextRank
+        ? `${rankDetails.pointsToNext} point${rankDetails.pointsToNext === 1 ? "" : "s"} to ${rankDetails.nextRank}`
+        : "Queen Bee reached";
+    elements.mobileFoundSummary.textContent = foundWords.length
+        ? `${foundWords.length} found`
+        : "Tap to open";
+    elements.mobileWordsCount.textContent = `${foundWords.length} word${foundWords.length === 1 ? "" : "s"}`;
+    elements.mobilePangramSummary.textContent = `${pangramsFound} pangram${pangramsFound === 1 ? "" : "s"}`;
+    elements.mobileFoundToggle.setAttribute("aria-expanded", String(state.mobileWordsOpen));
+    elements.mobileFoundPanel.hidden = !state.mobileWordsOpen;
 
     rankLadder.forEach((rank) => {
         const item = document.createElement("div");
@@ -641,13 +669,32 @@ function renderStats() {
 }
 
 function renderFoundWords(foundWords, puzzle) {
-    elements.foundWords.innerHTML = "";
+    renderFoundWordList(
+        elements.foundWords,
+        foundWords,
+        puzzle,
+        "No words found yet. Click letters or type on your keyboard."
+    );
+    renderFoundWordList(
+        elements.mobileFoundWords,
+        foundWords,
+        puzzle,
+        "Start finding words to build your list."
+    );
+}
+
+function renderFoundWordList(container, foundWords, puzzle, emptyMessage) {
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
 
     if (!foundWords.length) {
         const empty = document.createElement("div");
         empty.className = "empty-state";
-        empty.textContent = "No words found yet. Click letters or type on your keyboard.";
-        elements.foundWords.append(empty);
+        empty.textContent = emptyMessage;
+        container.append(empty);
         return;
     }
 
@@ -660,7 +707,7 @@ function renderFoundWords(foundWords, puzzle) {
                 chip.classList.add("is-pangram");
             }
             chip.textContent = word.toUpperCase();
-            elements.foundWords.append(chip);
+            container.append(chip);
         });
 }
 
@@ -1077,6 +1124,10 @@ function attachEvents() {
         state.puzzleSelectOpen = !state.puzzleSelectOpen;
         renderPuzzleSelect();
     });
+    elements.mobileFoundToggle.addEventListener("click", () => {
+        state.mobileWordsOpen = !state.mobileWordsOpen;
+        renderStats();
+    });
 
     elements.playBoardButtons.forEach((button) => {
         button.addEventListener("click", () => {
@@ -1113,6 +1164,7 @@ function attachEvents() {
         state.view = getViewFromHash();
         state.rankDetailOpen = false;
         state.puzzleSelectOpen = false;
+        state.mobileWordsOpen = false;
         renderTabs();
     });
     document.addEventListener("keydown", handleKeyboard);
