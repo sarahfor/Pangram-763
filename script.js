@@ -1,0 +1,1007 @@
+const STORAGE_KEYS = {
+    customPuzzles: "pangram763.customPuzzles.v1",
+    progress: "pangram763.progress.v1",
+    activePuzzle: "pangram763.activePuzzle.v1"
+};
+
+const DEFAULT_PUZZLES = [
+    {
+        id: "starter-aelprst",
+        title: "Starter Pangram",
+        letters: ["a", "e", "l", "p", "r", "s", "t"],
+        center: "a",
+        words: [
+            "alert",
+            "alter",
+            "apse",
+            "area",
+            "aster",
+            "easter",
+            "earl",
+            "late",
+            "later",
+            "least",
+            "leaps",
+            "paler",
+            "parse",
+            "pares",
+            "peals",
+            "pearl",
+            "petal",
+            "plate",
+            "plaster",
+            "pleas",
+            "pleat",
+            "rate",
+            "real",
+            "reaps",
+            "relate",
+            "sale",
+            "seal",
+            "slate",
+            "spare",
+            "spear",
+            "stale",
+            "staple",
+            "stapler",
+            "stare",
+            "tale",
+            "tape",
+            "tare",
+            "taser",
+            "teal",
+            "tear",
+            "tears",
+            "psalter"
+        ]
+    }
+];
+
+const WORD_BANK = Array.isArray(window.PANGRAM763_WORD_BANK) ? window.PANGRAM763_WORD_BANK : [];
+const GENERATED_WORDS_CACHE = new Map();
+const CONFETTI_COLORS = ["#f7cf39", "#171513", "#f29f05", "#ffffff", "#f4d77f"];
+let confettiCleanupTimer = 0;
+let celebrationStateTimer = 0;
+
+const RANKS = [
+    { threshold: 0, label: "Beginner" },
+    { threshold: 0.02, label: "Good Start" },
+    { threshold: 0.05, label: "Moving Up" },
+    { threshold: 0.08, label: "Good" },
+    { threshold: 0.15, label: "Solid" },
+    { threshold: 0.25, label: "Nice" },
+    { threshold: 0.4, label: "Great" },
+    { threshold: 0.5, label: "Amazing" },
+    { threshold: 0.7, label: "Genius" },
+    { threshold: 1, label: "Queen Bee" }
+];
+
+const state = {
+    customPuzzles: [],
+    puzzles: [],
+    progress: {},
+    activePuzzleId: "",
+    currentWord: "",
+    outerOrder: [],
+    view: "play",
+    rankDetailOpen: false
+};
+
+const elements = {
+    tabButtons: [...document.querySelectorAll(".tab-button")],
+    playPanel: document.getElementById("playPanel"),
+    createPanel: document.getElementById("createPanel"),
+    effectsLayer: document.getElementById("effectsLayer"),
+    puzzleSelect: document.getElementById("puzzleSelect"),
+    resetProgressButton: document.getElementById("resetProgressButton"),
+    playLetters: document.getElementById("playLetters"),
+    playLetterTiles: [...document.querySelectorAll("#playLetters .mini-hex")],
+    wordDisplay: document.getElementById("wordDisplay"),
+    statusMessage: document.getElementById("statusMessage"),
+    playBoard: document.getElementById("playBoard"),
+    playBoardButtons: [...document.querySelectorAll("#playBoard .hex")],
+    deleteButton: document.getElementById("deleteButton"),
+    shuffleButton: document.getElementById("shuffleButton"),
+    enterButton: document.getElementById("enterButton"),
+    wordsFoundValue: document.getElementById("wordsFoundValue"),
+    scoreValue: document.getElementById("scoreValue"),
+    pangramsValue: document.getElementById("pangramsValue"),
+    rankDropdown: document.getElementById("rankDropdown"),
+    rankCard: document.getElementById("rankCard"),
+    rankValue: document.getElementById("rankValue"),
+    rankDetail: document.getElementById("rankDetail"),
+    rankMenu: document.getElementById("rankMenu"),
+    rankMenuCurrent: document.getElementById("rankMenuCurrent"),
+    rankBreakdown: document.getElementById("rankBreakdown"),
+    scoreMeta: document.getElementById("scoreMeta"),
+    progressPercent: document.getElementById("progressPercent"),
+    progressBar: document.getElementById("progressBar"),
+    foundCountBadge: document.getElementById("foundCountBadge"),
+    foundWords: document.getElementById("foundWords"),
+    creatorForm: document.getElementById("creatorForm"),
+    lettersInput: document.getElementById("lettersInput"),
+    centerInput: document.getElementById("centerInput"),
+    creatorMessage: document.getElementById("creatorMessage"),
+    clearCreatorButton: document.getElementById("clearCreatorButton"),
+    savedPangramList: document.getElementById("savedPangramList")
+};
+
+function normalizeLetters(rawText) {
+    return rawText.toLowerCase().replace(/[^a-z]/g, "");
+}
+
+function uniqueCharacters(text) {
+    return [...new Set(text.split(""))].join("");
+}
+
+function isPangram(word, letters) {
+    return letters.every((letter) => word.includes(letter));
+}
+
+function getPuzzleKey(letters, center) {
+    return `${[...letters].sort().join("")}:${center}`;
+}
+
+function generateWordsForPangram(letters, center) {
+    const key = getPuzzleKey(letters, center);
+    const cachedWords = GENERATED_WORDS_CACHE.get(key);
+
+    if (cachedWords) {
+        return cachedWords;
+    }
+
+    const allowedLetters = new Set(letters);
+    const matchingWords = WORD_BANK.filter((word) => {
+        if (!word.includes(center)) {
+            return false;
+        }
+
+        return [...word].every((letter) => allowedLetters.has(letter));
+    });
+
+    GENERATED_WORDS_CACHE.set(key, matchingWords);
+    return matchingWords;
+}
+
+function normalizeCustomPuzzleTitle(title, index) {
+    if (typeof title !== "string" || !title.trim()) {
+        return `Custom Pangram ${index + 1}`;
+    }
+
+    return title.replace(/^Custom Hive\b/i, "Custom Pangram");
+}
+
+function buildCustomPuzzle(savedPuzzle, index = 0) {
+    const letters = Array.isArray(savedPuzzle.letters)
+        ? savedPuzzle.letters
+        : uniqueCharacters(normalizeLetters(savedPuzzle.letters || "")).split("");
+    const center = normalizeLetters(savedPuzzle.center || "").slice(0, 1);
+    const generatedWords = letters.length === 7 && center ? generateWordsForPangram(letters, center) : [];
+
+    return {
+        ...savedPuzzle,
+        title: normalizeCustomPuzzleTitle(savedPuzzle.title, index),
+        words: generatedWords.length ? generatedWords : savedPuzzle.words || []
+    };
+}
+
+function scoreWord(word, letters) {
+    const baseScore = word.length === 4 ? 1 : word.length;
+    return isPangram(word, letters) ? baseScore + 7 : baseScore;
+}
+
+function calculateMaxScore(puzzle) {
+    return puzzle.words.reduce((total, word) => total + scoreWord(word, puzzle.letters), 0);
+}
+
+function getRank(score, maxScore) {
+    if (!maxScore) {
+        return RANKS[0].label;
+    }
+
+    const progress = score / maxScore;
+    let currentRank = RANKS[0].label;
+
+    RANKS.forEach((rank) => {
+        if (progress >= rank.threshold) {
+            currentRank = rank.label;
+        }
+    });
+
+    return currentRank;
+}
+
+function getNextRankDetails(score, maxScore) {
+    if (!maxScore) {
+        return {
+            currentRank: RANKS[0].label,
+            nextRank: RANKS[1]?.label || null,
+            pointsToNext: 0
+        };
+    }
+
+    const progress = score / maxScore;
+    let currentIndex = 0;
+
+    RANKS.forEach((rank, index) => {
+        if (progress >= rank.threshold) {
+            currentIndex = index;
+        }
+    });
+
+    const currentRank = RANKS[currentIndex].label;
+    const nextRank = RANKS[currentIndex + 1] || null;
+
+    if (!nextRank) {
+        return {
+            currentRank,
+            nextRank: null,
+            pointsToNext: 0
+        };
+    }
+
+    const nextScoreTarget = Math.ceil(nextRank.threshold * maxScore);
+
+    return {
+        currentRank,
+        nextRank: nextRank.label,
+        pointsToNext: Math.max(0, nextScoreTarget - score)
+    };
+}
+
+function getRankLadder(score, maxScore) {
+    return RANKS.map((rank, index) => {
+        const targetScore = index === 0 ? 0 : Math.ceil(rank.threshold * maxScore);
+        const pointsAway = Math.max(0, targetScore - score);
+
+        return {
+            label: rank.label,
+            targetScore,
+            pointsAway,
+            reached: score >= targetScore
+        };
+    });
+}
+
+function readStorage(key, fallback) {
+    try {
+        const saved = localStorage.getItem(key);
+        return saved ? JSON.parse(saved) : fallback;
+    } catch (error) {
+        return fallback;
+    }
+}
+
+function writeStorage(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+}
+
+function hydratePuzzles() {
+    const savedCustomPuzzles = readStorage(STORAGE_KEYS.customPuzzles, []);
+    state.customPuzzles = savedCustomPuzzles.map((puzzle, index) => buildCustomPuzzle(puzzle, index));
+    state.puzzles = [...DEFAULT_PUZZLES, ...state.customPuzzles];
+
+    if (state.customPuzzles.some((puzzle, index) => puzzle.title !== savedCustomPuzzles[index]?.title)) {
+        saveCustomPuzzles();
+    }
+}
+
+function hydrateProgress() {
+    state.progress = readStorage(STORAGE_KEYS.progress, {});
+}
+
+function getActivePuzzle() {
+    return state.puzzles.find((puzzle) => puzzle.id === state.activePuzzleId) || state.puzzles[0] || null;
+}
+
+function getFoundWords(puzzleId) {
+    return state.progress[puzzleId] || [];
+}
+
+function saveProgress() {
+    writeStorage(STORAGE_KEYS.progress, state.progress);
+}
+
+function saveCustomPuzzles() {
+    writeStorage(
+        STORAGE_KEYS.customPuzzles,
+        state.customPuzzles.map((puzzle) => ({
+            id: puzzle.id,
+            title: puzzle.title,
+            letters: puzzle.letters,
+            center: puzzle.center
+        }))
+    );
+}
+
+function ensureActivePuzzle() {
+    const savedActiveId = localStorage.getItem(STORAGE_KEYS.activePuzzle);
+    const hasSavedPuzzle = state.puzzles.some((puzzle) => puzzle.id === savedActiveId);
+    state.activePuzzleId = hasSavedPuzzle ? savedActiveId : state.puzzles[0]?.id || "";
+    state.outerOrder = getOuterLetters(getActivePuzzle());
+    if (state.activePuzzleId) {
+        localStorage.setItem(STORAGE_KEYS.activePuzzle, state.activePuzzleId);
+    }
+}
+
+function setActivePuzzle(puzzleId) {
+    const nextPuzzle = state.puzzles.find((puzzle) => puzzle.id === puzzleId);
+    if (!nextPuzzle) {
+        return;
+    }
+
+    state.activePuzzleId = nextPuzzle.id;
+    state.currentWord = "";
+    state.outerOrder = getOuterLetters(nextPuzzle);
+    state.rankDetailOpen = false;
+    localStorage.setItem(STORAGE_KEYS.activePuzzle, nextPuzzle.id);
+    setStatus("Every word must use the center letter and stay inside the pangram.", "neutral");
+    renderPlay();
+}
+
+function getOuterLetters(puzzle) {
+    if (!puzzle) {
+        return ["?", "?", "?", "?", "?", "?"];
+    }
+
+    return puzzle.letters.filter((letter) => letter !== puzzle.center);
+}
+
+function setStatus(message, tone) {
+    elements.statusMessage.textContent = message;
+    elements.statusMessage.className = `status-message is-${tone}`;
+}
+
+function setCreatorMessage(message, tone) {
+    elements.creatorMessage.textContent = message;
+    elements.creatorMessage.className = `status-message is-${tone}`;
+}
+
+function closeRankMenu() {
+    if (!state.rankDetailOpen) {
+        return;
+    }
+
+    state.rankDetailOpen = false;
+    renderStats();
+}
+
+function getViewFromHash() {
+    return window.location.hash === "#create" ? "create" : "play";
+}
+
+function setView(nextView) {
+    state.view = nextView === "create" ? "create" : "play";
+    state.rankDetailOpen = false;
+    const nextHash = state.view === "create" ? "#create" : "#play";
+    if (window.location.hash !== nextHash) {
+        history.replaceState(null, "", nextHash);
+    }
+    renderTabs();
+}
+
+function renderTabs() {
+    elements.tabButtons.forEach((button) => {
+        const isActive = button.dataset.view === state.view;
+        button.classList.toggle("is-active", isActive);
+    });
+
+    elements.playPanel.classList.toggle("is-active", state.view === "play");
+    elements.createPanel.classList.toggle("is-active", state.view === "create");
+}
+
+function renderPuzzleSelect() {
+    const currentValue = state.activePuzzleId;
+    elements.puzzleSelect.innerHTML = "";
+
+    state.puzzles.forEach((puzzle) => {
+        const option = document.createElement("option");
+        option.value = puzzle.id;
+        option.textContent = `${puzzle.title} (${puzzle.letters.join("").toUpperCase()})`;
+        elements.puzzleSelect.append(option);
+    });
+
+    elements.puzzleSelect.value = currentValue;
+}
+
+function renderWordDisplay() {
+    const currentText = state.currentWord.toUpperCase();
+    elements.wordDisplay.innerHTML = "";
+
+    if (currentText) {
+        const wordNode = document.createElement("span");
+        wordNode.textContent = currentText;
+        elements.wordDisplay.append(wordNode);
+    }
+
+    const caret = document.createElement("span");
+    caret.className = "entry-caret";
+    caret.setAttribute("aria-hidden", "true");
+    elements.wordDisplay.append(caret);
+}
+
+function renderBoard(boardButtons, puzzle, outerOrder) {
+    if (!puzzle) {
+        return;
+    }
+
+    const slotMap = {
+        top: outerOrder[0],
+        "upper-left": outerOrder[1],
+        "upper-right": outerOrder[2],
+        center: puzzle.center,
+        "lower-left": outerOrder[3],
+        "lower-right": outerOrder[4],
+        bottom: outerOrder[5]
+    };
+
+    boardButtons.forEach((button) => {
+        const slot = button.dataset.slot;
+        const letter = slotMap[slot] || "?";
+        button.textContent = letter.toUpperCase();
+        button.dataset.letter = letter;
+
+        if (button.tagName === "BUTTON") {
+            button.setAttribute("aria-label", `Add ${letter.toUpperCase()}`);
+        }
+    });
+}
+
+function renderPlayLetters(puzzle) {
+    if (!elements.playLetters || !elements.playLetterTiles.length) {
+        return;
+    }
+
+    if (!puzzle) {
+        elements.playLetterTiles.forEach((tile) => {
+            tile.textContent = "?";
+        });
+        return;
+    }
+
+    const outerLetters = state.outerOrder.length === 6 ? state.outerOrder : getOuterLetters(puzzle);
+    renderBoard(elements.playLetterTiles, puzzle, outerLetters);
+}
+
+function renderStats() {
+    const puzzle = getActivePuzzle();
+    if (!puzzle) {
+        return;
+    }
+
+    const foundWords = getFoundWords(puzzle.id);
+    const totalScore = calculateMaxScore(puzzle);
+    const currentScore = foundWords.reduce((score, word) => score + scoreWord(word, puzzle.letters), 0);
+    const pangramsFound = foundWords.filter((word) => isPangram(word, puzzle.letters)).length;
+    const totalPangrams = puzzle.words.filter((word) => isPangram(word, puzzle.letters)).length;
+    const progress = totalScore ? Math.round((currentScore / totalScore) * 100) : 0;
+    const rankDetails = getNextRankDetails(currentScore, totalScore);
+    const rankLadder = getRankLadder(currentScore, totalScore);
+
+    elements.wordsFoundValue.textContent = String(foundWords.length);
+    elements.scoreValue.textContent = String(currentScore);
+    elements.pangramsValue.textContent = `${pangramsFound} / ${totalPangrams}`;
+    elements.rankValue.textContent = rankDetails.currentRank;
+    elements.scoreMeta.textContent = `${currentScore} of ${totalScore} points`;
+    elements.progressPercent.textContent = `${progress}%`;
+    elements.progressBar.style.width = `${progress}%`;
+    elements.foundCountBadge.textContent = String(foundWords.length);
+    elements.rankCard.setAttribute("aria-expanded", String(state.rankDetailOpen));
+    elements.rankDetail.textContent = rankDetails.nextRank
+        ? `${rankDetails.pointsToNext} point${rankDetails.pointsToNext === 1 ? "" : "s"} to ${rankDetails.nextRank}`
+        : "Queen Bee reached";
+    elements.rankMenuCurrent.textContent = rankDetails.currentRank;
+    elements.rankMenu.hidden = !state.rankDetailOpen;
+    elements.rankDropdown.classList.toggle("is-open", state.rankDetailOpen);
+    elements.rankBreakdown.innerHTML = "";
+
+    rankLadder.forEach((rank) => {
+        const item = document.createElement("div");
+        item.className = "rank-breakdown-row";
+
+        if (rank.label === rankDetails.currentRank) {
+            item.classList.add("is-current");
+        }
+
+        if (rank.reached) {
+            item.classList.add("is-reached");
+        }
+
+        const label = document.createElement("span");
+        label.className = "rank-breakdown-label";
+        label.textContent = rank.label;
+
+        const status = document.createElement("span");
+        status.className = "rank-breakdown-status";
+        status.textContent = rank.reached
+            ? "Reached"
+            : `${rank.pointsAway} point${rank.pointsAway === 1 ? "" : "s"} away`;
+
+        item.append(label, status);
+        elements.rankBreakdown.append(item);
+    });
+
+    renderFoundWords(foundWords, puzzle);
+}
+
+function renderFoundWords(foundWords, puzzle) {
+    elements.foundWords.innerHTML = "";
+
+    if (!foundWords.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        empty.textContent = "No words found yet. Click letters or type on your keyboard.";
+        elements.foundWords.append(empty);
+        return;
+    }
+
+    [...foundWords]
+        .reverse()
+        .forEach((word) => {
+            const chip = document.createElement("div");
+            chip.className = "word-chip";
+            if (isPangram(word, puzzle.letters)) {
+                chip.classList.add("is-pangram");
+            }
+            chip.textContent = word.toUpperCase();
+            elements.foundWords.append(chip);
+        });
+}
+
+function renderSavedPangrams() {
+    elements.savedPangramList.innerHTML = "";
+
+    if (!state.customPuzzles.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-state";
+        empty.textContent = "Your custom pangrams will appear here after you save one.";
+        elements.savedPangramList.append(empty);
+        return;
+    }
+
+    [...state.customPuzzles]
+        .reverse()
+        .forEach((puzzle) => {
+            const pangramCount = puzzle.words.filter((word) => isPangram(word, puzzle.letters)).length;
+
+            const card = document.createElement("article");
+            card.className = "saved-pangram-card";
+
+            const title = document.createElement("h4");
+            title.textContent = puzzle.title;
+
+            const letters = document.createElement("p");
+            letters.className = "saved-pangram-letters";
+            letters.textContent = `Letters: ${puzzle.letters.join(" ").toUpperCase()} | Center: ${puzzle.center.toUpperCase()}`;
+
+            const meta = document.createElement("p");
+            meta.className = "saved-pangram-meta";
+            meta.textContent = `${puzzle.words.length} words | ${pangramCount} pangram${pangramCount === 1 ? "" : "s"}`;
+
+            const actions = document.createElement("div");
+            actions.className = "saved-pangram-actions";
+
+            const playButton = document.createElement("button");
+            playButton.type = "button";
+            playButton.textContent = "Play";
+            playButton.addEventListener("click", () => {
+                setView("play");
+                setActivePuzzle(puzzle.id);
+            });
+
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "danger";
+            deleteButton.textContent = "Delete";
+            deleteButton.addEventListener("click", () => deleteCustomPangram(puzzle.id));
+
+            actions.append(playButton, deleteButton);
+            card.append(title, letters, meta, actions);
+            elements.savedPangramList.append(card);
+        });
+}
+
+function renderPlay() {
+    renderPuzzleSelect();
+    renderWordDisplay();
+
+    const puzzle = getActivePuzzle();
+    renderPlayLetters(puzzle);
+    renderBoard(elements.playBoardButtons, puzzle, state.outerOrder);
+    renderStats();
+}
+
+function renderAll() {
+    renderTabs();
+    renderPlay();
+    renderSavedPangrams();
+}
+
+function appendLetter(letter) {
+    const puzzle = getActivePuzzle();
+    if (!puzzle) {
+        return;
+    }
+
+    if (!puzzle.letters.includes(letter)) {
+        return;
+    }
+
+    state.currentWord += letter;
+    renderWordDisplay();
+}
+
+function deleteLetter() {
+    state.currentWord = state.currentWord.slice(0, -1);
+    renderWordDisplay();
+}
+
+function burstConfetti(options = {}) {
+    if (!elements.effectsLayer || !elements.playBoard) {
+        return;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        return;
+    }
+
+    const {
+        count = 28,
+        spreadX = 280,
+        peakY = 120,
+        endXSpread = 360,
+        endYBase = 120,
+        endYSpread = 170,
+        cleanupMs = 1400,
+        celebrationMs = 900
+    } = options;
+
+    window.clearTimeout(confettiCleanupTimer);
+    window.clearTimeout(celebrationStateTimer);
+    elements.effectsLayer.innerHTML = "";
+
+    const boardRect = elements.playBoard.getBoundingClientRect();
+    const originX = boardRect.left + boardRect.width / 2;
+    const originY = boardRect.top + boardRect.height / 2 - 10;
+
+    for (let index = 0; index < count; index += 1) {
+        const piece = document.createElement("span");
+        const burstX = `${Math.round((Math.random() - 0.5) * spreadX)}px`;
+        const midY = `${Math.round(-70 - Math.random() * peakY)}px`;
+        const endX = `${Math.round((Math.random() - 0.5) * endXSpread)}px`;
+        const endY = `${Math.round(endYBase + Math.random() * endYSpread)}px`;
+        const size = `${8 + Math.round(Math.random() * 8)}px`;
+        const rotation = `${Math.round((Math.random() - 0.5) * 540)}deg`;
+        const midRotation = `${Math.round((Math.random() - 0.5) * 260)}deg`;
+
+        piece.className = "confetti-piece";
+        piece.style.left = `${originX}px`;
+        piece.style.top = `${originY}px`;
+        piece.style.width = size;
+        piece.style.height = `${Math.max(6, Math.round(parseInt(size, 10) * 0.66))}px`;
+        piece.style.background = CONFETTI_COLORS[index % CONFETTI_COLORS.length];
+        piece.style.setProperty("--burst-x", burstX);
+        piece.style.setProperty("--mid-y", midY);
+        piece.style.setProperty("--end-x", endX);
+        piece.style.setProperty("--end-y", endY);
+        piece.style.setProperty("--rotation", rotation);
+        piece.style.setProperty("--mid-rotation", midRotation);
+        piece.style.animationDelay = `${Math.random() * 0.08}s`;
+
+        if (index % 3 === 0) {
+            piece.style.borderRadius = "999px";
+        }
+
+        elements.effectsLayer.append(piece);
+    }
+
+    elements.playPanel.classList.add("is-celebrating");
+
+    celebrationStateTimer = window.setTimeout(() => {
+        elements.playPanel.classList.remove("is-celebrating");
+    }, celebrationMs);
+
+    confettiCleanupTimer = window.setTimeout(() => {
+        elements.effectsLayer.innerHTML = "";
+    }, cleanupMs);
+}
+
+function completeSubmission(message, tone, options = {}) {
+    state.currentWord = "";
+    setStatus(message, tone);
+    renderPlay();
+
+    if (options.celebrate) {
+        burstConfetti(options.confetti);
+    }
+}
+
+function shuffleOuterLetters() {
+    const nextOrder = [...state.outerOrder];
+
+    for (let index = nextOrder.length - 1; index > 0; index -= 1) {
+        const swapIndex = Math.floor(Math.random() * (index + 1));
+        [nextOrder[index], nextOrder[swapIndex]] = [nextOrder[swapIndex], nextOrder[index]];
+    }
+
+    state.outerOrder = nextOrder;
+    renderPlay();
+}
+
+function submitWord() {
+    const puzzle = getActivePuzzle();
+    if (!puzzle) {
+        return;
+    }
+
+    const word = state.currentWord.toLowerCase();
+    const foundWords = getFoundWords(puzzle.id);
+
+    if (word.length < 4) {
+        completeSubmission("Words must be at least four letters long.", "error");
+        return;
+    }
+
+    if (!word.includes(puzzle.center)) {
+        completeSubmission(`Every word must include ${puzzle.center.toUpperCase()}.`, "error");
+        return;
+    }
+
+    if (![...word].every((letter) => puzzle.letters.includes(letter))) {
+        completeSubmission("That word uses letters outside this pangram.", "error");
+        return;
+    }
+
+    if (!puzzle.words.includes(word)) {
+        completeSubmission("That word is not in this pangram.", "error");
+        return;
+    }
+
+    if (foundWords.includes(word)) {
+        completeSubmission("Already found.", "info");
+        return;
+    }
+
+    const nextFoundWords = [...foundWords, word];
+    state.progress[puzzle.id] = nextFoundWords;
+    saveProgress();
+
+    if (nextFoundWords.length === puzzle.words.length) {
+        completeSubmission("Queen Bee!", "success", {
+            celebrate: true,
+            confetti: {
+                count: 96,
+                spreadX: 420,
+                peakY: 180,
+                endXSpread: 520,
+                endYBase: 150,
+                endYSpread: 240,
+                celebrationMs: 1300,
+                cleanupMs: 1900
+            }
+        });
+        return;
+    }
+
+    if (isPangram(word, puzzle.letters)) {
+        completeSubmission("Pangram!", "success", { celebrate: true });
+    } else {
+        completeSubmission(`Nice find: ${word.toUpperCase()}.`, "success");
+    }
+}
+
+function validateCreatorForm() {
+    const letters = uniqueCharacters(normalizeLetters(elements.lettersInput.value));
+    const center = normalizeLetters(elements.centerInput.value).slice(0, 1);
+
+    if (letters.length !== 7) {
+        return { error: "Enter exactly seven unique letters for the pangram." };
+    }
+
+    if (!center || !letters.includes(center)) {
+        return { error: "Choose one center letter from the seven letters in the pangram." };
+    }
+
+    if (!WORD_BANK.length) {
+        return { error: "The built-in dictionary is unavailable, so this pangram cannot be generated right now." };
+    }
+
+    const letterArray = letters.split("");
+    const words = generateWordsForPangram(letterArray, center);
+
+    if (!words.length) {
+        return { error: "This pangram does not generate any accepted words in the built-in dictionary." };
+    }
+
+    const pangrams = words.filter((word) => isPangram(word, letterArray));
+
+    if (!pangrams.length) {
+        return { error: "This custom pangram needs at least one pangram before it can be saved." };
+    }
+
+    return {
+        puzzle: {
+            id: `custom-${Date.now()}`,
+            title: `Custom Pangram ${state.customPuzzles.length + 1}`,
+            letters: letterArray,
+            center,
+            words
+        }
+    };
+}
+
+function clearCreatorForm() {
+    elements.creatorForm.reset();
+    setCreatorMessage("Enter seven unique letters and choose the center letter.", "neutral");
+}
+
+function saveCreatorPuzzle(event) {
+    event.preventDefault();
+    const result = validateCreatorForm();
+
+    if (result.error) {
+        setCreatorMessage(result.error, "error");
+        return;
+    }
+
+    state.customPuzzles = [...state.customPuzzles, result.puzzle];
+    saveCustomPuzzles();
+    state.puzzles = [...DEFAULT_PUZZLES, ...state.customPuzzles];
+    const pangramCount = result.puzzle.words.filter((word) => isPangram(word, result.puzzle.letters)).length;
+    clearCreatorForm();
+    setView("play");
+    setActivePuzzle(result.puzzle.id);
+    setCreatorMessage(
+        `Saved "${result.puzzle.title}" with ${result.puzzle.words.length} accepted words and ${pangramCount} pangram${pangramCount === 1 ? "" : "s"}.`,
+        "success"
+    );
+    renderAll();
+}
+
+function deleteCustomPangram(puzzleId) {
+    const puzzle = state.customPuzzles.find((item) => item.id === puzzleId);
+    if (!puzzle) {
+        return;
+    }
+
+    const shouldDelete = window.confirm(`Delete "${puzzle.title}"? This removes it from this browser.`);
+    if (!shouldDelete) {
+        return;
+    }
+
+    state.customPuzzles = state.customPuzzles.filter((item) => item.id !== puzzleId);
+    delete state.progress[puzzleId];
+    saveCustomPuzzles();
+    state.puzzles = [...DEFAULT_PUZZLES, ...state.customPuzzles];
+    saveProgress();
+
+    if (state.activePuzzleId === puzzleId) {
+        ensureActivePuzzle();
+    }
+
+    setCreatorMessage(`Deleted "${puzzle.title}".`, "info");
+    renderAll();
+}
+
+function clearCurrentProgress() {
+    const puzzle = getActivePuzzle();
+    if (!puzzle) {
+        return;
+    }
+
+    if (!getFoundWords(puzzle.id).length) {
+        setStatus("There is no saved progress to clear for this pangram yet.", "info");
+        return;
+    }
+
+    const shouldReset = window.confirm(`Clear your progress for "${puzzle.title}"?`);
+    if (!shouldReset) {
+        return;
+    }
+
+    delete state.progress[puzzle.id];
+    saveProgress();
+    state.currentWord = "";
+    setStatus(`Progress cleared for "${puzzle.title}".`, "info");
+    renderPlay();
+}
+
+function shouldIgnoreKeydown(event) {
+    const activeElement = document.activeElement;
+    if (!activeElement) {
+        return false;
+    }
+
+    const tagName = activeElement.tagName;
+    const isEditable = activeElement.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(tagName);
+    return isEditable || state.view !== "play";
+}
+
+function handleKeyboard(event) {
+    if (shouldIgnoreKeydown(event)) {
+        return;
+    }
+
+    if (event.key === "Backspace") {
+        event.preventDefault();
+        deleteLetter();
+        return;
+    }
+
+    if (event.key === "Enter") {
+        event.preventDefault();
+        submitWord();
+        return;
+    }
+
+    if (event.key === " ") {
+        event.preventDefault();
+        shuffleOuterLetters();
+        return;
+    }
+
+    if (/^[a-zA-Z]$/.test(event.key)) {
+        event.preventDefault();
+        appendLetter(event.key.toLowerCase());
+    }
+}
+
+function attachEvents() {
+    elements.tabButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            setView(button.dataset.view);
+        });
+    });
+
+    elements.puzzleSelect.addEventListener("change", (event) => {
+        setActivePuzzle(event.target.value);
+    });
+
+    elements.playBoardButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            appendLetter(button.dataset.letter);
+        });
+    });
+
+    elements.deleteButton.addEventListener("click", deleteLetter);
+    elements.shuffleButton.addEventListener("click", shuffleOuterLetters);
+    elements.enterButton.addEventListener("click", submitWord);
+    elements.resetProgressButton.addEventListener("click", clearCurrentProgress);
+    elements.rankCard.addEventListener("click", () => {
+        state.rankDetailOpen = !state.rankDetailOpen;
+        renderStats();
+    });
+    elements.creatorForm.addEventListener("submit", saveCreatorPuzzle);
+    elements.clearCreatorButton.addEventListener("click", clearCreatorForm);
+    document.addEventListener("click", (event) => {
+        if (!state.rankDetailOpen) {
+            return;
+        }
+
+        if (!elements.rankDropdown.contains(event.target)) {
+            closeRankMenu();
+        }
+    });
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            closeRankMenu();
+        }
+    });
+    window.addEventListener("hashchange", () => {
+        state.view = getViewFromHash();
+        state.rankDetailOpen = false;
+        renderTabs();
+    });
+    document.addEventListener("keydown", handleKeyboard);
+}
+
+function init() {
+    hydratePuzzles();
+    hydrateProgress();
+    ensureActivePuzzle();
+    state.view = getViewFromHash();
+    attachEvents();
+    renderAll();
+}
+
+init();

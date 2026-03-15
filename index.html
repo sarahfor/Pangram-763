@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f7cf39">
+    <title>Pangram 763</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="effects-layer" id="effectsLayer" aria-hidden="true"></div>
+    <div class="page-shell">
+        <header class="topbar reveal">
+            <div>
+                <h1>Pangram 763</h1>
+            </div>
+            <div class="storage-pill">Saved in this browser</div>
+        </header>
+
+        <nav class="tab-bar reveal" aria-label="Sections">
+            <button class="tab-button is-active" data-view="play" type="button">Play Pangrams</button>
+            <button class="tab-button" data-view="create" type="button">Create Pangrams</button>
+        </nav>
+
+        <main class="workspace">
+            <section class="panel panel-play is-active reveal" id="playPanel" aria-labelledby="playHeading">
+                <div class="play-layout">
+                    <section class="board-panel">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="section-label">Play</p>
+                                <h2 id="playHeading">Play a pangram</h2>
+                            </div>
+                            <div class="play-tools">
+                                <label class="field compact">
+                                    <span>Choose pangram</span>
+                                    <select id="puzzleSelect" aria-label="Choose pangram"></select>
+                                </label>
+                                <button class="subtle-button" id="resetProgressButton" type="button">Clear progress</button>
+                            </div>
+                        </div>
+
+                        <div class="play-stage">
+                            <div class="entry-card">
+                                <div class="entry-display" id="wordDisplay" aria-live="polite">
+                                    <span class="entry-caret" aria-hidden="true"></span>
+                                </div>
+                                <p class="status-message is-neutral" id="statusMessage">
+                                    Every word must use the center letter and stay inside the pangram.
+                                </p>
+                            </div>
+
+                            <div class="pangram-board" id="playBoard" aria-label="Pangram letters">
+                                <button class="hex hex-outer" data-slot="top" type="button"></button>
+                                <button class="hex hex-outer" data-slot="upper-left" type="button"></button>
+                                <button class="hex hex-outer" data-slot="upper-right" type="button"></button>
+                                <button class="hex hex-center" data-slot="center" type="button"></button>
+                                <button class="hex hex-outer" data-slot="lower-left" type="button"></button>
+                                <button class="hex hex-outer" data-slot="lower-right" type="button"></button>
+                                <button class="hex hex-outer" data-slot="bottom" type="button"></button>
+                            </div>
+
+                            <div class="control-row">
+                                <button class="action-button ghost" id="deleteButton" type="button">Delete</button>
+                                <button class="shuffle-button" id="shuffleButton" type="button" aria-label="Shuffle outer letters">
+                                    <span aria-hidden="true">↻</span>
+                                </button>
+                                <button class="action-button solid" id="enterButton" type="button">Enter</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <aside class="score-panel">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="section-label">Progress</p>
+                                <h2>Scoreboard</h2>
+                            </div>
+                        </div>
+
+                        <div class="stats-grid">
+                            <article class="stat-card">
+                                <span class="stat-label">Words found</span>
+                                <strong class="stat-value" id="wordsFoundValue">0</strong>
+                            </article>
+                            <article class="stat-card">
+                                <span class="stat-label">Score</span>
+                                <strong class="stat-value" id="scoreValue">0</strong>
+                            </article>
+                            <article class="stat-card">
+                                <span class="stat-label">Pangrams</span>
+                                <strong class="stat-value" id="pangramsValue">0 / 0</strong>
+                            </article>
+                            <div class="rank-dropdown" id="rankDropdown">
+                                <button
+                                    class="stat-card stat-card-button"
+                                    id="rankCard"
+                                    type="button"
+                                    aria-expanded="false"
+                                    aria-controls="rankMenu"
+                                >
+                                    <span class="stat-label">Rank</span>
+                                    <strong class="stat-value" id="rankValue">Beginner</strong>
+                                    <span class="stat-detail" id="rankDetail">View full rank ladder</span>
+                                    <span class="rank-caret" aria-hidden="true">▾</span>
+                                </button>
+                                <div class="rank-menu" id="rankMenu" hidden>
+                                    <div class="rank-menu-header">
+                                        <span class="rank-menu-label">Rank Ladder</span>
+                                        <strong class="rank-menu-current" id="rankMenuCurrent">Beginner</strong>
+                                    </div>
+                                    <div class="rank-breakdown" id="rankBreakdown"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <section class="progress-card">
+                            <div class="progress-meta">
+                                <span id="scoreMeta">0 of 0 points</span>
+                                <span id="progressPercent">0%</span>
+                            </div>
+                            <div class="progress-track" aria-hidden="true">
+                                <span class="progress-bar" id="progressBar"></span>
+                            </div>
+                        </section>
+
+                        <section class="found-card">
+                            <div class="found-header">
+                                <p class="section-label">Found words</p>
+                                <span id="foundCountBadge">0</span>
+                            </div>
+                            <div class="found-words" id="foundWords"></div>
+                        </section>
+                    </aside>
+                </div>
+            </section>
+
+            <section class="panel panel-create reveal" id="createPanel" aria-labelledby="createHeading">
+                <div class="creator-layout">
+                    <section class="creator-form-panel">
+                        <div class="panel-heading">
+                            <div>
+                                <p class="section-label">Create</p>
+                                <h2 id="createHeading">Build your own pangram</h2>
+                            </div>
+                        </div>
+
+                        <form id="creatorForm" novalidate>
+                            <div class="field-grid">
+                                <label class="field">
+                                    <span>Seven unique letters</span>
+                                    <input id="lettersInput" name="letters" type="text" maxlength="7" placeholder="aelprst" autocomplete="off">
+                                </label>
+                                <label class="field">
+                                    <span>Center letter</span>
+                                    <input id="centerInput" name="center" type="text" maxlength="1" placeholder="a" autocomplete="off">
+                                </label>
+                            </div>
+
+                            <p class="status-message is-neutral" id="creatorMessage">
+                                Enter seven unique letters and choose the center letter.
+                            </p>
+
+                            <div class="form-actions">
+                                <button class="action-button solid" type="submit">Save pangram</button>
+                                <button class="action-button ghost" id="clearCreatorButton" type="button">Reset</button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <aside class="creator-sidebar">
+                        <section class="saved-card">
+                            <div class="panel-heading compact-heading">
+                                <div>
+                                    <p class="section-label">Saved pangrams</p>
+                                    <h3>Your custom pangrams</h3>
+                                </div>
+                            </div>
+                            <div class="saved-pangrams" id="savedPangramList"></div>
+                        </section>
+                    </aside>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="word-bank.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
