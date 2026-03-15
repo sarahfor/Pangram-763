@@ -430,6 +430,34 @@ function getPuzzleDisplayName(puzzle) {
     return "Custom Pangram";
 }
 
+function getPuzzleDisplayLetters(puzzle) {
+    if (!puzzle || !Array.isArray(puzzle.letters)) {
+        return "???????";
+    }
+
+    const scrambledLetters = [...puzzle.letters];
+    const originalOrder = scrambledLetters.join("");
+    let seed = puzzle.id
+        .split("")
+        .reduce((value, character) => ((value * 31) + character.charCodeAt(0)) >>> 0, 7);
+
+    for (let index = scrambledLetters.length - 1; index > 0; index -= 1) {
+        seed = ((seed * 1664525) + 1013904223) >>> 0;
+        const swapIndex = seed % (index + 1);
+        [scrambledLetters[index], scrambledLetters[swapIndex]] = [scrambledLetters[swapIndex], scrambledLetters[index]];
+    }
+
+    if (scrambledLetters.join("") === originalOrder) {
+        scrambledLetters.push(scrambledLetters.shift());
+    }
+
+    return scrambledLetters.join("").toUpperCase();
+}
+
+function getPuzzleDisplayLabel(puzzle) {
+    return `${getPuzzleDisplayName(puzzle)} (${getPuzzleDisplayLetters(puzzle)})`;
+}
+
 function renderTabs() {
     elements.tabButtons.forEach((button) => {
         const isActive = button.dataset.view === state.view;
@@ -447,7 +475,7 @@ function renderPuzzleSelect() {
     state.puzzles.forEach((puzzle) => {
         const option = document.createElement("option");
         option.value = puzzle.id;
-        option.textContent = getPuzzleDisplayName(puzzle);
+        option.textContent = getPuzzleDisplayLabel(puzzle);
         elements.puzzleSelect.append(option);
     });
 
@@ -613,17 +641,13 @@ function renderSavedPangrams() {
         .reverse()
         .forEach((puzzle) => {
             const pangramCount = puzzle.words.filter((word) => isPangram(word, puzzle.letters)).length;
-            const displayName = getPuzzleDisplayName(puzzle);
+            const displayName = getPuzzleDisplayLabel(puzzle);
 
             const card = document.createElement("article");
             card.className = "saved-pangram-card";
 
             const title = document.createElement("h4");
             title.textContent = displayName;
-
-            const letters = document.createElement("p");
-            letters.className = "saved-pangram-letters";
-            letters.textContent = `Letters: ${puzzle.letters.join(" ").toUpperCase()} | Center: ${puzzle.center.toUpperCase()}`;
 
             const meta = document.createElement("p");
             meta.className = "saved-pangram-meta";
@@ -647,7 +671,7 @@ function renderSavedPangrams() {
             deleteButton.addEventListener("click", () => deleteCustomPangram(puzzle.id));
 
             actions.append(playButton, deleteButton);
-            card.append(title, letters, meta, actions);
+            card.append(title, meta, actions);
             elements.savedPangramList.append(card);
         });
 }
@@ -899,7 +923,7 @@ function saveCreatorPuzzle(event) {
     saveCustomPuzzles();
     state.puzzles = [...DEFAULT_PUZZLES, ...state.customPuzzles];
     const pangramCount = result.puzzle.words.filter((word) => isPangram(word, result.puzzle.letters)).length;
-    const displayName = getPuzzleDisplayName(result.puzzle);
+    const displayName = getPuzzleDisplayLabel(result.puzzle);
     clearCreatorForm();
     setView("play");
     setActivePuzzle(result.puzzle.id);
@@ -916,7 +940,7 @@ function deleteCustomPangram(puzzleId) {
         return;
     }
 
-    const displayName = getPuzzleDisplayName(puzzle);
+    const displayName = getPuzzleDisplayLabel(puzzle);
     const shouldDelete = window.confirm(`Delete ${displayName}? This removes it from this browser.`);
     if (!shouldDelete) {
         return;
@@ -947,7 +971,7 @@ function clearCurrentProgress() {
         return;
     }
 
-    const displayName = getPuzzleDisplayName(puzzle);
+    const displayName = getPuzzleDisplayLabel(puzzle);
     const shouldReset = window.confirm(`Clear your progress for ${displayName}?`);
     if (!shouldReset) {
         return;
