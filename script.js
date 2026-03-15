@@ -78,6 +78,12 @@ const DEFAULT_PUZZLES = [
         title: "Gravity",
         letters: ["a", "g", "i", "r", "t", "v", "y"],
         center: "a"
+    },
+    {
+        id: "sodilhc-cdhilos",
+        title: "Sodilhc",
+        letters: ["c", "d", "h", "i", "l", "o", "s"],
+        center: "l"
     }
 ];
 
