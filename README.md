@@ -28,7 +28,7 @@ While playing, the app keeps track of:
 
 It also includes small celebration moments like confetti for pangrams and a larger celebration for Queen Bee.
 
-## Features In Plain Language
+## Application Features
 
 - A honeycomb-style letter board you can tap or type from the keyboard.
 - A required center letter, just like a spelling puzzle.
