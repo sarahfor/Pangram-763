@@ -66,6 +66,18 @@ const DEFAULT_PUZZLES = [
         title: "Gymnasts",
         letters: ["a", "g", "m", "n", "s", "t", "y"],
         center: "g"
+    },
+    {
+        id: "cowbird-bcdiorw",
+        title: "Cowbird",
+        letters: ["b", "c", "d", "i", "o", "r", "w"],
+        center: "o"
+    },
+    {
+        id: "gravity-agirtvy",
+        title: "Gravity",
+        letters: ["a", "g", "i", "r", "t", "v", "y"],
+        center: "a"
     }
 ];
 
