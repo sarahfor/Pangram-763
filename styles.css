@@ -420,7 +420,6 @@ h3 {
 
 .select-trigger {
     width: 100%;
-    min-width: 0;
     min-height: 54px;
     display: flex;
     align-items: center;
@@ -437,15 +436,6 @@ h3 {
         inset 0 1px 0 rgba(255, 255, 255, 0.82),
         0 10px 20px rgba(55, 40, 10, 0.03);
     transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-}
-
-#puzzleSelectCurrent {
-    display: block;
-    flex: 1 1 auto;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 .select-trigger:hover,
@@ -1144,10 +1134,6 @@ button.hex-center:focus-visible {
     gap: 12px;
 }
 
-.mobile-summary {
-    display: none;
-}
-
 .word-chip,
 .empty-state {
     border-radius: 999px;
@@ -1314,27 +1300,9 @@ button.hex-center:focus-visible {
         margin-bottom: calc(28px + var(--safe-bottom));
     }
 
-    .topbar {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 12px;
-        padding: 0 2px;
-    }
-
-    h1 {
-        font-size: clamp(1.95rem, 10vw, 2.55rem);
-        line-height: 0.96;
-    }
-
-    .storage-pill {
-        display: none;
-    }
-
     .panel {
-        padding: 14px;
-        border-radius: 24px;
+        padding: 16px;
+        border-radius: 28px;
     }
 
     .board-panel,
@@ -1342,26 +1310,18 @@ button.hex-center:focus-visible {
     .creator-form-panel,
     .preview-card,
     .saved-card {
-        padding: 14px;
+        padding: 16px;
         border-radius: 22px;
-    }
-
-    .score-panel {
-        display: none;
     }
 
     .tab-bar {
         display: flex;
         width: 100%;
-        margin-bottom: 14px;
-        padding: 5px;
     }
 
     .tab-button {
         flex: 1;
         text-align: center;
-        padding: 10px 12px;
-        font-size: 0.9rem;
     }
 
     .panel-heading {
@@ -1371,206 +1331,22 @@ button.hex-center:focus-visible {
 
     .board-panel {
         top: calc(var(--safe-top) + 8px);
-        gap: 10px;
-        padding: 12px;
-        border-radius: 22px;
-    }
-
-    .board-panel > .panel-heading > div:first-child {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        margin: -1px;
-        padding: 0;
-        overflow: hidden;
-        clip: rect(0 0 0 0);
-        clip-path: inset(50%);
-        white-space: nowrap;
-        border: 0;
-    }
-
-    .mobile-summary {
-        display: grid;
-        gap: 8px;
-    }
-
-    .mobile-rank-card,
-    .mobile-found-panel {
-        border: 1px solid rgba(196, 153, 23, 0.14);
-        border-radius: 24px;
-        background:
-            linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 243, 228, 0.94));
-        box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.84),
-            0 14px 24px rgba(55, 40, 10, 0.05);
-    }
-
-    .mobile-rank-card {
-        padding: 12px 14px 10px;
-        border-radius: 20px;
-    }
-
-    .mobile-rank-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .mobile-rank-label {
-        font-family: Georgia, "Times New Roman", serif;
-        font-size: clamp(1.28rem, 5.8vw, 1.72rem);
-        letter-spacing: -0.03em;
-    }
-
-    .mobile-rank-meta {
-        color: var(--muted);
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-    }
-
-    .mobile-progress-row {
-        display: grid;
-        grid-template-columns: auto minmax(0, 1fr);
-        gap: 10px;
-        align-items: center;
-        margin-top: 8px;
-    }
-
-    .mobile-score-bubble {
-        width: 48px;
-        height: 48px;
-        display: grid;
-        place-items: center;
-        border-radius: 999px;
-        background: linear-gradient(180deg, #ffde58, #f7cf39 72%, #efc429);
-        color: var(--ink);
-        font-size: 1.08rem;
-        font-weight: 800;
-        box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.58),
-            0 12px 22px rgba(226, 179, 0, 0.22);
-    }
-
-    .mobile-progress-track {
-        position: relative;
-        height: 18px;
-        border-radius: 999px;
-        background:
-            linear-gradient(90deg, rgba(111, 102, 92, 0.16), rgba(111, 102, 92, 0.16)) center / 100% 3px no-repeat,
-            radial-gradient(circle, rgba(233, 229, 222, 0.98) 0 5px, transparent 6px) center / calc(100% / 8) 18px repeat-x;
-        overflow: hidden;
-    }
-
-    .mobile-progress-fill {
-        position: absolute;
-        top: 50%;
-        left: 0;
-        height: 4px;
-        transform: translateY(-50%);
-        border-radius: 999px;
-        background: linear-gradient(90deg, #f7cf39, #f2b705);
-        box-shadow: 0 6px 10px rgba(226, 179, 0, 0.18);
-    }
-
-    .mobile-next-rank {
-        margin: 8px 0 0;
-        color: var(--muted);
-        font-size: 0.84rem;
-        line-height: 1.4;
-    }
-
-    .mobile-found-toggle {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        border: 1px solid rgba(196, 153, 23, 0.14);
-        border-radius: 24px;
-        background:
-            linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 243, 228, 0.94));
-        color: var(--ink);
-        padding: 12px 14px;
-        box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.84),
-            0 14px 24px rgba(55, 40, 10, 0.05);
-    }
-
-    .mobile-found-toggle-copy {
-        display: grid;
-        gap: 4px;
-        justify-items: start;
-        text-align: left;
-    }
-
-    .mobile-found-toggle-title {
-        font-size: 0.96rem;
-        font-weight: 800;
-    }
-
-    .mobile-found-toggle-meta {
-        color: var(--muted);
-        font-size: 0.84rem;
-    }
-
-    .mobile-found-toggle-caret {
-        color: var(--ink);
-        font-size: 1.08rem;
-        transition: transform 0.2s ease;
-    }
-
-    .mobile-found-toggle[aria-expanded="true"] .mobile-found-toggle-caret {
-        transform: rotate(180deg);
-    }
-
-    .mobile-found-panel {
+        gap: 14px;
         padding: 14px;
-    }
-
-    .mobile-found-panel[hidden] {
-        display: none;
-    }
-
-    .mobile-found-stats {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        color: var(--muted);
-        font-size: 0.82rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-    }
-
-    .mobile-found-words {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        max-height: 190px;
-        overflow: auto;
-        padding-right: 2px;
-    }
-
-    .mobile-found-words .word-chip,
-    .mobile-found-words .empty-state {
-        font-size: 0.92rem;
+        border-radius: 22px;
     }
 
     .play-stage {
-        gap: 12px;
-        padding: 12px;
-        border-radius: 22px;
+        gap: 14px;
+        padding: 14px;
+        border-radius: 26px;
     }
 
     .play-tools {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
-        align-items: center;
-        gap: 8px;
+        align-items: end;
+        gap: 10px;
         justify-content: stretch;
     }
 
@@ -1579,53 +1355,26 @@ button.hex-center:focus-visible {
         width: 100%;
     }
 
-    .play-tools .field.compact span {
-        display: none;
-    }
-
-    .play-tools .select-trigger {
-        min-height: 48px;
-        padding: 12px 14px;
-        border-radius: 18px;
-        font-size: 0.95rem;
-    }
-
     .play-tools .subtle-button {
         width: auto;
-        min-height: 48px;
-        padding: 10px 14px;
-        border-radius: 18px;
-        font-size: 0.9rem;
         white-space: nowrap;
     }
 
-    .entry-card {
-        padding: 10px 10px 9px;
-        border-radius: 22px;
-    }
-
     .entry-display {
-        min-height: 58px;
-        padding: 10px 12px 10px 14px;
+        min-height: clamp(72px, 14svh, 88px);
+        padding-left: 14px;
         border-left-width: 3px;
-        border-radius: 18px;
-        font-size: clamp(1.5rem, 8vw, 2.6rem);
+        font-size: clamp(1.7rem, 9vw, 3.1rem);
     }
 
-    .status-message {
-        margin-top: 8px;
-        padding: 8px 10px;
-        font-size: 0.82rem;
-        border-radius: 14px;
-    }
-
-    .status-message.is-neutral {
-        display: none;
+    .mini-pangram-board {
+        --hex-width: 3.75rem;
+        --hex-height: 3.18rem;
+        margin-top: -4px;
     }
 
     .pangram-board {
-        --hex-width: clamp(4.85rem, 18vw, 5.55rem);
-        margin-top: 0;
+        --hex-width: clamp(5.4rem, 11.7vw, 7.2rem);
     }
 
     .pangram-board-small {
@@ -1633,22 +1382,13 @@ button.hex-center:focus-visible {
     }
 
     .control-row {
-        gap: 6px;
-        padding: 4px;
-        width: min(100%, 22rem);
+        gap: 10px;
+        padding: 6px;
     }
 
     .action-button {
-        padding: 0 14px;
-        min-height: 50px;
-        font-size: 0.96rem;
-    }
-
-    .shuffle-button {
-        width: 52px;
-        min-width: 52px;
-        min-height: 50px;
-        font-size: 1.45rem;
+        padding: 0 16px;
+        min-height: 56px;
     }
 
     .field-grid {
@@ -1674,39 +1414,44 @@ button.hex-center:focus-visible {
     }
 
     h1 {
-        font-size: 1.92rem;
+        font-size: 2.3rem;
+    }
+
+    .storage-pill {
+        width: 100%;
+        text-align: center;
     }
 
     .tab-bar {
-        gap: 5px;
-        padding: 4px;
+        gap: 6px;
+        padding: 6px;
     }
 
     .tab-button {
-        padding: 9px 10px;
-        font-size: 0.85rem;
+        padding: 11px 10px;
+        font-size: 0.94rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
     }
 
     .play-tools {
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: 1fr;
     }
 
     .play-tools .subtle-button {
-        width: auto;
-        min-width: 108px;
+        width: 100%;
     }
 
-    .mobile-rank-card {
-        padding: 11px 12px 10px;
+    .entry-card {
+        padding: 12px 12px 10px;
     }
 
-    .mobile-found-toggle {
-        padding: 11px 12px;
-    }
-
-    .mobile-found-stats {
-        flex-direction: column;
-        gap: 6px;
+    .mini-pangram-board {
+        --hex-width: 3rem;
+        --hex-height: 2.55rem;
+        margin-top: -2px;
     }
 
     .rank-menu {
@@ -1721,20 +1466,31 @@ button.hex-center:focus-visible {
     }
 
     .pangram-board {
-        --hex-width: clamp(4.55rem, 19vw, 5.2rem);
+        --hex-width: clamp(4.5rem, 14.4vw, 5.67rem);
+    }
+
+    .pangram-board-small {
+        --hex-width: clamp(2.9rem, 5vw, 3.95rem);
     }
 
     .hex {
-        font-size: clamp(1.45rem, 6.1vw, 1.82rem);
+        font-size: clamp(1.4rem, 5.8vw, 1.7rem);
     }
 
     .control-row {
-        width: 100%;
+        gap: 6px;
+    }
+
+    .shuffle-button {
+        width: 56px;
+        min-width: 56px;
+        min-height: 56px;
+        font-size: 1.65rem;
     }
 
     .action-button {
         padding: 0 10px;
-        font-size: 0.9rem;
+        font-size: 0.92rem;
     }
 
     .saved-pangram-actions {
