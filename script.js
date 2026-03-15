@@ -520,8 +520,7 @@ function renderPuzzleSelect() {
     });
 
     elements.puzzleSelect.value = currentValue;
-    const activePuzzle = state.puzzles.find((puzzle) => puzzle.id === currentValue) || state.puzzles[0] || null;
-    elements.puzzleSelectCurrent.textContent = activePuzzle ? getPuzzleDisplayLabel(activePuzzle) : "Choose pangram";
+    elements.puzzleSelectCurrent.textContent = "Choose Puzzle";
     elements.puzzleSelectButton.setAttribute("aria-expanded", String(state.puzzleSelectOpen));
     elements.puzzleSelectMenu.hidden = !state.puzzleSelectOpen;
     elements.puzzleSelectWrap.classList.toggle("is-open", state.puzzleSelectOpen);
