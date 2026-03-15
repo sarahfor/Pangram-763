@@ -416,6 +416,20 @@ function setView(nextView) {
     renderTabs();
 }
 
+function getPuzzleDisplayName(puzzle) {
+    if (!puzzle) {
+        return "Custom Pangram";
+    }
+
+    const visibleIndex = state.puzzles.findIndex((item) => item.id === puzzle.id);
+
+    if (visibleIndex >= 0) {
+        return `Custom Pangram ${visibleIndex + 1}`;
+    }
+
+    return "Custom Pangram";
+}
+
 function renderTabs() {
     elements.tabButtons.forEach((button) => {
         const isActive = button.dataset.view === state.view;
@@ -433,7 +447,7 @@ function renderPuzzleSelect() {
     state.puzzles.forEach((puzzle) => {
         const option = document.createElement("option");
         option.value = puzzle.id;
-        option.textContent = `${puzzle.title} (${puzzle.letters.join("").toUpperCase()})`;
+        option.textContent = getPuzzleDisplayName(puzzle);
         elements.puzzleSelect.append(option);
     });
 
@@ -599,12 +613,13 @@ function renderSavedPangrams() {
         .reverse()
         .forEach((puzzle) => {
             const pangramCount = puzzle.words.filter((word) => isPangram(word, puzzle.letters)).length;
+            const displayName = getPuzzleDisplayName(puzzle);
 
             const card = document.createElement("article");
             card.className = "saved-pangram-card";
 
             const title = document.createElement("h4");
-            title.textContent = puzzle.title;
+            title.textContent = displayName;
 
             const letters = document.createElement("p");
             letters.className = "saved-pangram-letters";
@@ -884,11 +899,12 @@ function saveCreatorPuzzle(event) {
     saveCustomPuzzles();
     state.puzzles = [...DEFAULT_PUZZLES, ...state.customPuzzles];
     const pangramCount = result.puzzle.words.filter((word) => isPangram(word, result.puzzle.letters)).length;
+    const displayName = getPuzzleDisplayName(result.puzzle);
     clearCreatorForm();
     setView("play");
     setActivePuzzle(result.puzzle.id);
     setCreatorMessage(
-        `Saved "${result.puzzle.title}" with ${result.puzzle.words.length} accepted words and ${pangramCount} pangram${pangramCount === 1 ? "" : "s"}.`,
+        `Saved ${displayName} with ${result.puzzle.words.length} accepted words and ${pangramCount} pangram${pangramCount === 1 ? "" : "s"}.`,
         "success"
     );
     renderAll();
@@ -900,7 +916,8 @@ function deleteCustomPangram(puzzleId) {
         return;
     }
 
-    const shouldDelete = window.confirm(`Delete "${puzzle.title}"? This removes it from this browser.`);
+    const displayName = getPuzzleDisplayName(puzzle);
+    const shouldDelete = window.confirm(`Delete ${displayName}? This removes it from this browser.`);
     if (!shouldDelete) {
         return;
     }
@@ -915,7 +932,7 @@ function deleteCustomPangram(puzzleId) {
         ensureActivePuzzle();
     }
 
-    setCreatorMessage(`Deleted "${puzzle.title}".`, "info");
+    setCreatorMessage(`Deleted ${displayName}.`, "info");
     renderAll();
 }
 
@@ -930,7 +947,8 @@ function clearCurrentProgress() {
         return;
     }
 
-    const shouldReset = window.confirm(`Clear your progress for "${puzzle.title}"?`);
+    const displayName = getPuzzleDisplayName(puzzle);
+    const shouldReset = window.confirm(`Clear your progress for ${displayName}?`);
     if (!shouldReset) {
         return;
     }
@@ -938,7 +956,7 @@ function clearCurrentProgress() {
     delete state.progress[puzzle.id];
     saveProgress();
     state.currentWord = "";
-    setStatus(`Progress cleared for "${puzzle.title}".`, "info");
+    setStatus(`Progress cleared for ${displayName}.`, "info");
     renderPlay();
 }
 
