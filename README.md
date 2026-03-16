@@ -73,17 +73,6 @@ It also uses:
 - `localStorage` to save progress and custom puzzles in the browser
 - `GitHub Pages` to publish the website online
 
-## Why That Matters
-
-Because it uses standard web technology, the app is:
-
-- lightweight
-- fast to load
-- easy to update
-- simple to host online
-
-There is no separate app install required. People can just open the website and play.
-
 ## Project Files
 
 The main files are:
