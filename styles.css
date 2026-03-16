@@ -78,7 +78,7 @@ body::before {
     width: clamp(72px, 10vw, 108px);
     opacity: 0;
     filter: drop-shadow(0 10px 20px rgba(55, 40, 10, 0.18));
-    transform: translate3d(-18vw, var(--bee-start-y), 0) scale(var(--bee-scale)) rotate(var(--bee-rotate-start));
+    transform: translate3d(-18vw, var(--bee-start-y), 0) scale(var(--bee-scale)) rotate(90deg) rotate(var(--bee-rotate-start));
     animation: bee-fly-across var(--bee-duration) cubic-bezier(0.22, 0.74, 0.16, 1) forwards;
 }
 
@@ -126,7 +126,7 @@ body::before {
 @keyframes bee-fly-across {
     0% {
         opacity: 0;
-        transform: translate3d(-18vw, var(--bee-start-y), 0) scale(var(--bee-scale)) rotate(var(--bee-rotate-start));
+        transform: translate3d(-18vw, var(--bee-start-y), 0) scale(var(--bee-scale)) rotate(90deg) rotate(var(--bee-rotate-start));
     }
 
     10% {
@@ -135,12 +135,12 @@ body::before {
 
     50% {
         opacity: 1;
-        transform: translate3d(52vw, var(--bee-mid-y), 0) scale(var(--bee-scale)) rotate(var(--bee-rotate-mid));
+        transform: translate3d(52vw, var(--bee-mid-y), 0) scale(var(--bee-scale)) rotate(90deg) rotate(var(--bee-rotate-mid));
     }
 
     100% {
         opacity: 0;
-        transform: translate3d(116vw, var(--bee-end-y), 0) scale(var(--bee-scale)) rotate(var(--bee-rotate-end));
+        transform: translate3d(116vw, var(--bee-end-y), 0) scale(var(--bee-scale)) rotate(90deg) rotate(var(--bee-rotate-end));
     }
 }
 
