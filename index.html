@@ -48,7 +48,13 @@
                                     <div class="select-menu" id="puzzleSelectMenu" role="listbox" hidden></div>
                                     <p class="active-puzzle-note" id="activePuzzleNote">Current puzzle: Choose a puzzle</p>
                                 </div>
-                                <button class="subtle-button" id="resetProgressButton" type="button">Clear progress</button>
+                                <div class="play-tools-sidecar">
+                                    <button class="subtle-button" id="resetProgressButton" type="button">Clear progress</button>
+                                    <div class="subtle-button subtle-button-static pangram-chip" id="mobilePangramChip" aria-live="polite">
+                                        <span class="pangram-chip-label">Pangrams</span>
+                                        <strong class="pangram-chip-value" id="mobilePangramCount">0 / 0</strong>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

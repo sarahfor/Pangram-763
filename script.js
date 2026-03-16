@@ -132,6 +132,7 @@ const elements = {
     puzzleSelectMenu: document.getElementById("puzzleSelectMenu"),
     activePuzzleNote: document.getElementById("activePuzzleNote"),
     resetProgressButton: document.getElementById("resetProgressButton"),
+    mobilePangramCount: document.getElementById("mobilePangramCount"),
     playLetters: document.getElementById("playLetters"),
     playLetterTiles: [...document.querySelectorAll("#playLetters .mini-hex")],
     wordDisplay: document.getElementById("wordDisplay"),
@@ -681,6 +682,9 @@ function renderStats() {
     }
     if (elements.mobileFoundCount) {
         elements.mobileFoundCount.textContent = String(foundWords.length);
+    }
+    if (elements.mobilePangramCount) {
+        elements.mobilePangramCount.textContent = `${pangramsFound} / ${totalPangrams}`;
     }
     if (elements.mobileUtilityPanel) {
         elements.mobileUtilityPanel.hidden = false;
