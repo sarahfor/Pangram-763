@@ -1249,6 +1249,10 @@ button.hex-center:focus-visible {
     margin-top: 14px;
 }
 
+.mobile-utility-view[hidden] {
+    display: none !important;
+}
+
 .mobile-ranking-panel {
     display: grid;
     gap: 14px;

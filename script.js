@@ -93,19 +93,17 @@ const CONFETTI_COLORS = ["#f7cf39", "#171513", "#f29f05", "#ffffff", "#f4d77f"];
 let confettiCleanupTimer = 0;
 let celebrationStateTimer = 0;
 
-const GENIUS_SCORE_TARGET = 478;
-const SMALL_PUZZLE_GENIUS_RATIO = 0.9;
 const RANKS = [
-    { threshold: 0, label: "Beginner", anchor: "genius" },
-    { threshold: 0.02, label: "Good Start", anchor: "genius" },
-    { threshold: 0.05, label: "Moving Up", anchor: "genius" },
-    { threshold: 0.08, label: "Good", anchor: "genius" },
-    { threshold: 0.15, label: "Solid", anchor: "genius" },
-    { threshold: 0.25, label: "Nice", anchor: "genius" },
-    { threshold: 0.4, label: "Great", anchor: "genius" },
-    { threshold: 0.5, label: "Amazing", anchor: "genius" },
-    { threshold: 1, label: "Genius", anchor: "genius" },
-    { threshold: 1, label: "Queen Bee", anchor: "queen" }
+    { threshold: 0, label: "Beginner" },
+    { threshold: 0.02, label: "Good Start" },
+    { threshold: 0.05, label: "Moving Up" },
+    { threshold: 0.08, label: "Good" },
+    { threshold: 0.15, label: "Solid" },
+    { threshold: 0.25, label: "Nice" },
+    { threshold: 0.4, label: "Great" },
+    { threshold: 0.5, label: "Amazing" },
+    { threshold: 0.7, label: "Genius" },
+    { threshold: 1, label: "Queen Bee" }
 ];
 
 const state = {
@@ -250,44 +248,16 @@ function calculateMaxScore(puzzle) {
     return puzzle.words.reduce((total, word) => total + scoreWord(word, puzzle.letters), 0);
 }
 
-function getGeniusTargetScore(maxScore) {
-    if (!maxScore) {
-        return 0;
-    }
-
-    if (maxScore > GENIUS_SCORE_TARGET) {
-        return GENIUS_SCORE_TARGET;
-    }
-
-    return Math.max(1, Math.min(maxScore - 1, Math.floor(maxScore * SMALL_PUZZLE_GENIUS_RATIO)));
-}
-
-function getRankTargets(maxScore) {
-    if (!maxScore) {
-        return RANKS.map((rank) => ({
-            ...rank,
-            targetScore: rank.label === "Beginner" ? 0 : Infinity
-        }));
-    }
-
-    const geniusTarget = getGeniusTargetScore(maxScore);
-
-    return RANKS.map((rank) => ({
-        ...rank,
-        targetScore: rank.anchor === "queen" ? maxScore : Math.ceil(rank.threshold * geniusTarget)
-    }));
-}
-
 function getRank(score, maxScore) {
     if (!maxScore) {
         return RANKS[0].label;
     }
 
-    const rankTargets = getRankTargets(maxScore);
-    let currentRank = rankTargets[0].label;
+    const progress = score / maxScore;
+    let currentRank = RANKS[0].label;
 
-    rankTargets.forEach((rank) => {
-        if (score >= rank.targetScore) {
+    RANKS.forEach((rank) => {
+        if (progress >= rank.threshold) {
             currentRank = rank.label;
         }
     });
@@ -304,17 +274,17 @@ function getNextRankDetails(score, maxScore) {
         };
     }
 
-    const rankTargets = getRankTargets(maxScore);
+    const progress = score / maxScore;
     let currentIndex = 0;
 
-    rankTargets.forEach((rank, index) => {
-        if (score >= rank.targetScore) {
+    RANKS.forEach((rank, index) => {
+        if (progress >= rank.threshold) {
             currentIndex = index;
         }
     });
 
-    const currentRank = rankTargets[currentIndex].label;
-    const nextRank = rankTargets[currentIndex + 1] || null;
+    const currentRank = RANKS[currentIndex].label;
+    const nextRank = RANKS[currentIndex + 1] || null;
 
     if (!nextRank) {
         return {
@@ -327,7 +297,7 @@ function getNextRankDetails(score, maxScore) {
     return {
         currentRank,
         nextRank: nextRank.label,
-        pointsToNext: Math.max(0, nextRank.targetScore - score)
+        pointsToNext: Math.max(0, Math.ceil(nextRank.threshold * maxScore) - score)
     };
 }
 
@@ -341,8 +311,8 @@ function getRankLadder(score, maxScore) {
         }));
     }
 
-    return getRankTargets(maxScore).map((rank) => {
-        const targetScore = Number.isFinite(rank.targetScore) ? rank.targetScore : 0;
+    return RANKS.map((rank, index) => {
+        const targetScore = index === 0 ? 0 : Math.ceil(rank.threshold * maxScore);
         const pointsAway = Math.max(0, targetScore - score);
 
         return {
