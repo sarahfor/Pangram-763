@@ -93,17 +93,19 @@ const CONFETTI_COLORS = ["#f7cf39", "#171513", "#f29f05", "#ffffff", "#f4d77f"];
 let confettiCleanupTimer = 0;
 let celebrationStateTimer = 0;
 
+const GENIUS_SCORE_TARGET = 478;
+const SMALL_PUZZLE_GENIUS_RATIO = 0.9;
 const RANKS = [
-    { threshold: 0, label: "Beginner" },
-    { threshold: 0.02, label: "Good Start" },
-    { threshold: 0.05, label: "Moving Up" },
-    { threshold: 0.08, label: "Good" },
-    { threshold: 0.15, label: "Solid" },
-    { threshold: 0.25, label: "Nice" },
-    { threshold: 0.4, label: "Great" },
-    { threshold: 0.5, label: "Amazing" },
-    { threshold: 0.7, label: "Genius" },
-    { threshold: 1, label: "Queen Bee" }
+    { threshold: 0, label: "Beginner", anchor: "genius" },
+    { threshold: 0.02, label: "Good Start", anchor: "genius" },
+    { threshold: 0.05, label: "Moving Up", anchor: "genius" },
+    { threshold: 0.08, label: "Good", anchor: "genius" },
+    { threshold: 0.15, label: "Solid", anchor: "genius" },
+    { threshold: 0.25, label: "Nice", anchor: "genius" },
+    { threshold: 0.4, label: "Great", anchor: "genius" },
+    { threshold: 0.5, label: "Amazing", anchor: "genius" },
+    { threshold: 1, label: "Genius", anchor: "genius" },
+    { threshold: 1, label: "Queen Bee", anchor: "queen" }
 ];
 
 const state = {
@@ -115,7 +117,8 @@ const state = {
     outerOrder: [],
     view: "play",
     rankDetailOpen: false,
-    puzzleSelectOpen: false
+    puzzleSelectOpen: false,
+    mobilePanel: "words"
 };
 
 const elements = {
@@ -142,9 +145,14 @@ const elements = {
     mobileScoreValue: document.getElementById("mobileScoreValue"),
     mobileProgressBar: document.getElementById("mobileProgressBar"),
     mobileProgressNote: document.getElementById("mobileProgressNote"),
+    mobileUtilityPanel: document.getElementById("mobileUtilityPanel"),
+    mobileUtilityTabs: [...document.querySelectorAll(".mobile-utility-tab")],
     mobileFoundCount: document.getElementById("mobileFoundCount"),
-    mobileFoundPanel: document.getElementById("mobileFoundPanel"),
+    mobileWordsPanel: document.getElementById("mobileWordsPanel"),
     mobileFoundWords: document.getElementById("mobileFoundWords"),
+    mobileRankingPanel: document.getElementById("mobileRankingPanel"),
+    mobileRankMenuCurrent: document.getElementById("mobileRankMenuCurrent"),
+    mobileRankBreakdown: document.getElementById("mobileRankBreakdown"),
     wordsFoundValue: document.getElementById("wordsFoundValue"),
     scoreValue: document.getElementById("scoreValue"),
     pangramsValue: document.getElementById("pangramsValue"),
@@ -242,16 +250,44 @@ function calculateMaxScore(puzzle) {
     return puzzle.words.reduce((total, word) => total + scoreWord(word, puzzle.letters), 0);
 }
 
+function getGeniusTargetScore(maxScore) {
+    if (!maxScore) {
+        return 0;
+    }
+
+    if (maxScore > GENIUS_SCORE_TARGET) {
+        return GENIUS_SCORE_TARGET;
+    }
+
+    return Math.max(1, Math.min(maxScore - 1, Math.floor(maxScore * SMALL_PUZZLE_GENIUS_RATIO)));
+}
+
+function getRankTargets(maxScore) {
+    if (!maxScore) {
+        return RANKS.map((rank) => ({
+            ...rank,
+            targetScore: rank.label === "Beginner" ? 0 : Infinity
+        }));
+    }
+
+    const geniusTarget = getGeniusTargetScore(maxScore);
+
+    return RANKS.map((rank) => ({
+        ...rank,
+        targetScore: rank.anchor === "queen" ? maxScore : Math.ceil(rank.threshold * geniusTarget)
+    }));
+}
+
 function getRank(score, maxScore) {
     if (!maxScore) {
         return RANKS[0].label;
     }
 
-    const progress = score / maxScore;
-    let currentRank = RANKS[0].label;
+    const rankTargets = getRankTargets(maxScore);
+    let currentRank = rankTargets[0].label;
 
-    RANKS.forEach((rank) => {
-        if (progress >= rank.threshold) {
+    rankTargets.forEach((rank) => {
+        if (score >= rank.targetScore) {
             currentRank = rank.label;
         }
     });
@@ -268,17 +304,17 @@ function getNextRankDetails(score, maxScore) {
         };
     }
 
-    const progress = score / maxScore;
+    const rankTargets = getRankTargets(maxScore);
     let currentIndex = 0;
 
-    RANKS.forEach((rank, index) => {
-        if (progress >= rank.threshold) {
+    rankTargets.forEach((rank, index) => {
+        if (score >= rank.targetScore) {
             currentIndex = index;
         }
     });
 
-    const currentRank = RANKS[currentIndex].label;
-    const nextRank = RANKS[currentIndex + 1] || null;
+    const currentRank = rankTargets[currentIndex].label;
+    const nextRank = rankTargets[currentIndex + 1] || null;
 
     if (!nextRank) {
         return {
@@ -288,18 +324,25 @@ function getNextRankDetails(score, maxScore) {
         };
     }
 
-    const nextScoreTarget = Math.ceil(nextRank.threshold * maxScore);
-
     return {
         currentRank,
         nextRank: nextRank.label,
-        pointsToNext: Math.max(0, nextScoreTarget - score)
+        pointsToNext: Math.max(0, nextRank.targetScore - score)
     };
 }
 
 function getRankLadder(score, maxScore) {
-    return RANKS.map((rank, index) => {
-        const targetScore = index === 0 ? 0 : Math.ceil(rank.threshold * maxScore);
+    if (!maxScore) {
+        return RANKS.map((rank, index) => ({
+            label: rank.label,
+            targetScore: 0,
+            pointsAway: 0,
+            reached: index === 0
+        }));
+    }
+
+    return getRankTargets(maxScore).map((rank) => {
+        const targetScore = Number.isFinite(rank.targetScore) ? rank.targetScore : 0;
         const pointsAway = Math.max(0, targetScore - score);
 
         return {
@@ -422,6 +465,33 @@ function closePuzzleSelectMenu() {
 
     state.puzzleSelectOpen = false;
     renderPuzzleSelect();
+}
+
+function setMobilePanel(panelName) {
+    state.mobilePanel = panelName === "ranking" ? "ranking" : "words";
+    renderMobilePanel();
+}
+
+function renderMobilePanel() {
+    if (!elements.mobileUtilityTabs.length) {
+        return;
+    }
+
+    const isRanking = state.mobilePanel === "ranking";
+
+    elements.mobileUtilityTabs.forEach((button) => {
+        const isActive = button.dataset.mobilePanel === state.mobilePanel;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-selected", String(isActive));
+    });
+
+    if (elements.mobileWordsPanel) {
+        elements.mobileWordsPanel.hidden = isRanking;
+    }
+
+    if (elements.mobileRankingPanel) {
+        elements.mobileRankingPanel.hidden = !isRanking;
+    }
 }
 
 function getViewFromHash() {
@@ -625,8 +695,8 @@ function renderStats() {
     if (elements.mobileFoundCount) {
         elements.mobileFoundCount.textContent = String(foundWords.length);
     }
-    if (elements.mobileFoundPanel) {
-        elements.mobileFoundPanel.hidden = false;
+    if (elements.mobileUtilityPanel) {
+        elements.mobileUtilityPanel.hidden = false;
     }
     elements.rankCard.setAttribute("aria-expanded", String(state.rankDetailOpen));
     elements.rankDetail.textContent = rankDetails.nextRank
@@ -635,13 +705,28 @@ function renderStats() {
     elements.rankMenuCurrent.textContent = rankDetails.currentRank;
     elements.rankMenu.hidden = !state.rankDetailOpen;
     elements.rankDropdown.classList.toggle("is-open", state.rankDetailOpen);
-    elements.rankBreakdown.innerHTML = "";
+    renderRankBreakdown(elements.rankBreakdown, rankLadder, rankDetails.currentRank);
+    if (elements.mobileRankMenuCurrent) {
+        elements.mobileRankMenuCurrent.textContent = rankDetails.currentRank;
+    }
+    renderRankBreakdown(elements.mobileRankBreakdown, rankLadder, rankDetails.currentRank);
+    renderMobilePanel();
+
+    renderFoundWords(foundWords, puzzle);
+}
+
+function renderRankBreakdown(container, rankLadder, currentRank) {
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
 
     rankLadder.forEach((rank) => {
         const item = document.createElement("div");
         item.className = "rank-breakdown-row";
 
-        if (rank.label === rankDetails.currentRank) {
+        if (rank.label === currentRank) {
             item.classList.add("is-current");
         }
 
@@ -660,10 +745,8 @@ function renderStats() {
             : `${rank.pointsAway} point${rank.pointsAway === 1 ? "" : "s"} away`;
 
         item.append(label, status);
-        elements.rankBreakdown.append(item);
+        container.append(item);
     });
-
-    renderFoundWords(foundWords, puzzle);
 }
 
 function renderFoundWords(foundWords, puzzle) {
@@ -1136,6 +1219,11 @@ function attachEvents() {
     elements.rankCard.addEventListener("click", () => {
         state.rankDetailOpen = !state.rankDetailOpen;
         renderStats();
+    });
+    elements.mobileUtilityTabs.forEach((button) => {
+        button.addEventListener("click", () => {
+            setMobilePanel(button.dataset.mobilePanel);
+        });
     });
     elements.creatorForm.addEventListener("submit", saveCreatorPuzzle);
     elements.clearCreatorButton.addEventListener("click", clearCreatorForm);

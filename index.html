@@ -96,14 +96,42 @@
                             </div>
                         </div>
 
-                        <section class="mobile-found-panel" id="mobileFoundPanel" aria-label="Words found">
-                            <div class="mobile-found-panel-header">
-                                <div>
-                                    <p class="section-label">Words found</p>
-                                </div>
-                                <span class="mobile-found-count" id="mobileFoundCount">0</span>
+                        <section class="mobile-utility-panel" id="mobileUtilityPanel" aria-label="Puzzle details">
+                            <div class="mobile-utility-tabs" role="tablist" aria-label="Puzzle details">
+                                <button
+                                    class="mobile-utility-tab is-active"
+                                    id="mobileWordsTab"
+                                    data-mobile-panel="words"
+                                    type="button"
+                                    role="tab"
+                                    aria-selected="true"
+                                    aria-controls="mobileWordsPanel"
+                                >
+                                    <span>Words found</span>
+                                    <span class="mobile-found-count" id="mobileFoundCount">0</span>
+                                </button>
+                                <button
+                                    class="mobile-utility-tab"
+                                    id="mobileRankingTab"
+                                    data-mobile-panel="ranking"
+                                    type="button"
+                                    role="tab"
+                                    aria-selected="false"
+                                    aria-controls="mobileRankingPanel"
+                                >
+                                    <span>Ranking</span>
+                                </button>
                             </div>
-                            <div class="mobile-found-words" id="mobileFoundWords"></div>
+                            <div class="mobile-utility-view" id="mobileWordsPanel" role="tabpanel" aria-labelledby="mobileWordsTab">
+                                <div class="mobile-found-words" id="mobileFoundWords"></div>
+                            </div>
+                            <div class="mobile-utility-view mobile-ranking-panel" id="mobileRankingPanel" role="tabpanel" aria-labelledby="mobileRankingTab" hidden>
+                                <div class="mobile-ranking-head">
+                                    <p class="section-label">Ranking</p>
+                                    <strong class="mobile-ranking-current" id="mobileRankMenuCurrent">Beginner</strong>
+                                </div>
+                                <div class="rank-breakdown mobile-rank-breakdown" id="mobileRankBreakdown"></div>
+                            </div>
                         </section>
                     </section>
 
