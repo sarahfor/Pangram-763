@@ -4,56 +4,62 @@ const STORAGE_KEYS = {
     activePuzzle: "pangram763.activePuzzle.v1"
 };
 
+const CURATED_AELPRST_WORDS = [
+    "alert",
+    "alter",
+    "apse",
+    "area",
+    "aster",
+    "earl",
+    "easter",
+    "late",
+    "later",
+    "leaps",
+    "least",
+    "paler",
+    "pares",
+    "parse",
+    "peals",
+    "pearl",
+    "petal",
+    "plaster",
+    "plate",
+    "pleas",
+    "pleat",
+    "psalter",
+    "rate",
+    "real",
+    "reaps",
+    "relate",
+    "sale",
+    "seal",
+    "slate",
+    "spare",
+    "spear",
+    "stale",
+    "staple",
+    "stapler",
+    "stare",
+    "tale",
+    "tape",
+    "tare",
+    "taser",
+    "teal",
+    "tear",
+    "tears"
+];
+
+const CURATED_WORD_SETS = {
+    "aelprst:a": CURATED_AELPRST_WORDS
+};
+
 const DEFAULT_PUZZLES = [
     {
         id: "starter-aelprst",
         title: "Starter Pangram",
         letters: ["a", "e", "l", "p", "r", "s", "t"],
         center: "a",
-        words: [
-            "alert",
-            "alter",
-            "apse",
-            "area",
-            "aster",
-            "easter",
-            "earl",
-            "late",
-            "later",
-            "least",
-            "leaps",
-            "paler",
-            "parse",
-            "pares",
-            "peals",
-            "pearl",
-            "petal",
-            "plate",
-            "plaster",
-            "pleas",
-            "pleat",
-            "rate",
-            "real",
-            "reaps",
-            "relate",
-            "sale",
-            "seal",
-            "slate",
-            "spare",
-            "spear",
-            "stale",
-            "staple",
-            "stapler",
-            "stare",
-            "tale",
-            "tape",
-            "tare",
-            "taser",
-            "teal",
-            "tear",
-            "tears",
-            "psalter"
-        ]
+        words: CURATED_AELPRST_WORDS
     },
     {
         id: "schedule-cdehlsu",
@@ -197,6 +203,11 @@ function generateWordsForPangram(letters, center) {
 
     if (cachedWords) {
         return cachedWords;
+    }
+
+    if (CURATED_WORD_SETS[key]) {
+        GENERATED_WORDS_CACHE.set(key, CURATED_WORD_SETS[key]);
+        return CURATED_WORD_SETS[key];
     }
 
     const allowedLetters = new Set(letters);
