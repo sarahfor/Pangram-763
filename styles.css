@@ -410,6 +410,10 @@ h3 {
     margin-bottom: 0;
 }
 
+#playHeading {
+    white-space: nowrap;
+}
+
 .compact-heading {
     margin-bottom: 12px;
 }
