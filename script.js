@@ -37,6 +37,7 @@ const CURATED_AELPRST_WORDS = [
     "spare",
     "spear",
     "stale",
+    "start",
     "staple",
     "stapler",
     "stare",
@@ -54,13 +55,6 @@ const CURATED_WORD_SETS = {
 };
 
 const DEFAULT_PUZZLES = [
-    {
-        id: "starter-aelprst",
-        title: "Starter Pangram",
-        letters: ["a", "e", "l", "p", "r", "s", "t"],
-        center: "a",
-        words: CURATED_AELPRST_WORDS
-    },
     {
         id: "schedule-cdehlsu",
         title: "Schedule",
@@ -136,6 +130,7 @@ const elements = {
     puzzleSelectButton: document.getElementById("puzzleSelectButton"),
     puzzleSelectCurrent: document.getElementById("puzzleSelectCurrent"),
     puzzleSelectMenu: document.getElementById("puzzleSelectMenu"),
+    activePuzzleNote: document.getElementById("activePuzzleNote"),
     resetProgressButton: document.getElementById("resetProgressButton"),
     playLetters: document.getElementById("playLetters"),
     playLetterTiles: [...document.querySelectorAll("#playLetters .mini-hex")],
@@ -549,6 +544,7 @@ function renderTabs() {
 
 function renderPuzzleSelect() {
     const currentValue = state.activePuzzleId;
+    const activePuzzle = getActivePuzzle();
     elements.puzzleSelect.innerHTML = "";
     elements.puzzleSelectMenu.innerHTML = "";
 
@@ -577,6 +573,11 @@ function renderPuzzleSelect() {
 
     elements.puzzleSelect.value = currentValue;
     elements.puzzleSelectCurrent.textContent = "Choose Puzzle";
+    if (elements.activePuzzleNote) {
+        elements.activePuzzleNote.textContent = activePuzzle
+            ? `Current puzzle: ${getPuzzleDisplayLabel(activePuzzle)}`
+            : "Current puzzle: None selected";
+    }
     elements.puzzleSelectButton.setAttribute("aria-expanded", String(state.puzzleSelectOpen));
     elements.puzzleSelectMenu.hidden = !state.puzzleSelectOpen;
     elements.puzzleSelectWrap.classList.toggle("is-open", state.puzzleSelectOpen);

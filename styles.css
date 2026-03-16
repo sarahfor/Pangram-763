@@ -477,6 +477,14 @@ h3 {
     position: relative;
 }
 
+.active-puzzle-note {
+    margin: 10px 4px 0;
+    color: var(--muted);
+    font-size: 0.84rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
 .native-select-hidden {
     position: absolute;
     width: 1px;
@@ -1609,6 +1617,11 @@ button.hex-center:focus-visible {
 
     .play-tools .field.compact > span {
         display: none;
+    }
+
+    .active-puzzle-note {
+        margin: 8px 2px 0;
+        font-size: 0.78rem;
     }
 
     #puzzleSelectCurrent {
