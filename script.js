@@ -91,6 +91,7 @@ const WORD_BANK = Array.isArray(window.PANGRAM763_WORD_BANK) ? window.PANGRAM763
 const GENERATED_WORDS_CACHE = new Map();
 const CONFETTI_COLORS = ["#f7cf39", "#171513", "#f29f05", "#ffffff", "#f4d77f"];
 let confettiCleanupTimer = 0;
+let beeCleanupTimer = 0;
 let celebrationStateTimer = 0;
 
 const RANKS = [
@@ -246,6 +247,10 @@ function scoreWord(word, letters) {
 
 function calculateMaxScore(puzzle) {
     return puzzle.words.reduce((total, word) => total + scoreWord(word, puzzle.letters), 0);
+}
+
+function calculateFoundScore(foundWords, puzzle) {
+    return foundWords.reduce((score, word) => score + scoreWord(word, puzzle.letters), 0);
 }
 
 function getRank(score, maxScore) {
@@ -633,7 +638,7 @@ function renderStats() {
 
     const foundWords = getFoundWords(puzzle.id);
     const totalScore = calculateMaxScore(puzzle);
-    const currentScore = foundWords.reduce((score, word) => score + scoreWord(word, puzzle.letters), 0);
+    const currentScore = calculateFoundScore(foundWords, puzzle);
     const pangramsFound = foundWords.filter((word) => isPangram(word, puzzle.letters)).length;
     const totalPangrams = puzzle.words.filter((word) => isPangram(word, puzzle.letters)).length;
     const progress = totalScore ? Math.round((currentScore / totalScore) * 100) : 0;
@@ -869,7 +874,7 @@ function burstConfetti(options = {}) {
 
     window.clearTimeout(confettiCleanupTimer);
     window.clearTimeout(celebrationStateTimer);
-    elements.effectsLayer.innerHTML = "";
+    elements.effectsLayer.querySelectorAll(".confetti-piece").forEach((piece) => piece.remove());
 
     const boardRect = elements.playBoard.getBoundingClientRect();
     const originX = boardRect.left + boardRect.width / 2;
@@ -913,7 +918,91 @@ function burstConfetti(options = {}) {
     }, celebrationMs);
 
     confettiCleanupTimer = window.setTimeout(() => {
-        elements.effectsLayer.innerHTML = "";
+        elements.effectsLayer.querySelectorAll(".confetti-piece").forEach((piece) => piece.remove());
+    }, cleanupMs);
+}
+
+function getBeeSvgMarkup(uniqueId) {
+    return `
+        <svg viewBox="0 0 180 170" aria-hidden="true" focusable="false">
+            <g fill="none" stroke="#181410" stroke-width="6" stroke-linecap="round">
+                <path d="M78 34 C72 16, 60 8, 50 12" />
+                <path d="M102 34 C108 16, 120 8, 130 12" />
+            </g>
+            <g class="rank-bee-wing rank-bee-wing--left">
+                <ellipse cx="46" cy="78" rx="32" ry="18" fill="rgba(255,255,255,0.88)" stroke="#181410" stroke-width="6" />
+            </g>
+            <g class="rank-bee-wing rank-bee-wing--right">
+                <ellipse cx="134" cy="78" rx="32" ry="18" fill="rgba(255,255,255,0.88)" stroke="#181410" stroke-width="6" />
+            </g>
+            <ellipse cx="90" cy="48" rx="22" ry="20" fill="#181410" />
+            <defs>
+                <clipPath id="rankBeeBody${uniqueId}">
+                    <path d="M90 62 C69 62 57 80 57 103 C57 126 71 145 90 153 C109 145 123 126 123 103 C123 80 111 62 90 62 Z" />
+                </clipPath>
+            </defs>
+            <path d="M90 62 C69 62 57 80 57 103 C57 126 71 145 90 153 C109 145 123 126 123 103 C123 80 111 62 90 62 Z" fill="#181410" />
+            <g clip-path="url(#rankBeeBody${uniqueId})">
+                <rect x="61" y="82" width="58" height="11" rx="5.5" fill="#f7cf39" />
+                <rect x="59" y="99" width="62" height="11" rx="5.5" fill="#f7cf39" />
+                <rect x="63" y="116" width="54" height="11" rx="5.5" fill="#f7cf39" />
+            </g>
+            <path d="M90 153 L81 166 L99 166 Z" fill="#181410" />
+        </svg>
+    `;
+}
+
+function flyRankBees(options = {}) {
+    if (!elements.effectsLayer) {
+        return;
+    }
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        return;
+    }
+
+    const {
+        gainedRanks = 1,
+        cleanupMs = 2600
+    } = options;
+
+    const count = Math.min(7, Math.max(3, 3 + gainedRanks));
+    const bandTop = Math.max(72, window.innerHeight * 0.14);
+    const bandHeight = Math.min(320, window.innerHeight * 0.42);
+    const spacingDivisor = count > 1 ? count - 1 : 1;
+
+    window.clearTimeout(beeCleanupTimer);
+    elements.effectsLayer.querySelectorAll(".rank-bee").forEach((bee) => bee.remove());
+
+    for (let index = 0; index < count; index += 1) {
+        const bee = document.createElement("span");
+        const startY = Math.round(bandTop + (bandHeight / spacingDivisor) * index + (Math.random() - 0.5) * 28);
+        const midY = startY + Math.round((Math.random() - 0.5) * 54);
+        const endY = startY + Math.round((Math.random() - 0.5) * 88);
+        const scale = (0.72 + Math.random() * 0.28).toFixed(2);
+        const startRotate = `${Math.round(-12 + Math.random() * 8)}deg`;
+        const midRotate = `${Math.round(-2 + Math.random() * 12)}deg`;
+        const endRotate = `${Math.round(-10 + Math.random() * 20)}deg`;
+        const duration = `${(1.75 + Math.random() * 0.55).toFixed(2)}s`;
+        const uniqueId = `${Date.now()}-${index}-${Math.random().toString(36).slice(2, 7)}`;
+
+        bee.className = "rank-bee";
+        bee.innerHTML = getBeeSvgMarkup(uniqueId);
+        bee.style.setProperty("--bee-start-y", `${startY}px`);
+        bee.style.setProperty("--bee-mid-y", `${midY}px`);
+        bee.style.setProperty("--bee-end-y", `${endY}px`);
+        bee.style.setProperty("--bee-scale", scale);
+        bee.style.setProperty("--bee-rotate-start", startRotate);
+        bee.style.setProperty("--bee-rotate-mid", midRotate);
+        bee.style.setProperty("--bee-rotate-end", endRotate);
+        bee.style.setProperty("--bee-duration", duration);
+        bee.style.animationDelay = `${(index * 0.12 + Math.random() * 0.08).toFixed(2)}s`;
+
+        elements.effectsLayer.append(bee);
+    }
+
+    beeCleanupTimer = window.setTimeout(() => {
+        elements.effectsLayer.querySelectorAll(".rank-bee").forEach((bee) => bee.remove());
     }, cleanupMs);
 }
 
@@ -921,6 +1010,10 @@ function completeSubmission(message, tone, options = {}) {
     state.currentWord = "";
     setStatus(message, tone);
     renderPlay();
+
+    if (options.rankUp) {
+        flyRankBees(options.rankUp);
+    }
 
     if (options.celebrate) {
         burstConfetti(options.confetti);
@@ -947,6 +1040,10 @@ function submitWord() {
 
     const word = state.currentWord.toLowerCase();
     const foundWords = getFoundWords(puzzle.id);
+    const totalScore = calculateMaxScore(puzzle);
+    const previousScore = calculateFoundScore(foundWords, puzzle);
+    const previousRank = getRank(previousScore, totalScore);
+    const previousRankIndex = RANKS.findIndex((rank) => rank.label === previousRank);
 
     if (word.length < 4) {
         completeSubmission("Words must be at least four letters long.", "error");
@@ -974,11 +1071,20 @@ function submitWord() {
     }
 
     const nextFoundWords = [...foundWords, word];
+    const nextScore = previousScore + scoreWord(word, puzzle.letters);
+    const nextRank = getRank(nextScore, totalScore);
+    const nextRankIndex = RANKS.findIndex((rank) => rank.label === nextRank);
+    const rankUp =
+        nextRankIndex > previousRankIndex
+            ? { gainedRanks: nextRankIndex - previousRankIndex, rank: nextRank }
+            : null;
+
     state.progress[puzzle.id] = nextFoundWords;
     saveProgress();
 
     if (nextFoundWords.length === puzzle.words.length) {
         completeSubmission("Queen Bee!", "success", {
+            rankUp,
             celebrate: true,
             confetti: {
                 count: 96,
@@ -995,9 +1101,9 @@ function submitWord() {
     }
 
     if (isPangram(word, puzzle.letters)) {
-        completeSubmission("Pangram!", "success", { celebrate: true });
+        completeSubmission("Pangram!", "success", { celebrate: true, rankUp });
     } else {
-        completeSubmission(`Nice find: ${word.toUpperCase()}.`, "success");
+        completeSubmission(`Nice find: ${word.toUpperCase()}.`, "success", { rankUp });
     }
 }
 

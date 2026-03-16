@@ -71,6 +71,38 @@ body::before {
     animation: confetti-burst 1.15s cubic-bezier(0.18, 0.8, 0.34, 1) forwards;
 }
 
+.rank-bee {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: clamp(72px, 10vw, 108px);
+    opacity: 0;
+    filter: drop-shadow(0 10px 20px rgba(55, 40, 10, 0.18));
+    transform: translate3d(-18vw, var(--bee-start-y), 0) scale(var(--bee-scale)) rotate(var(--bee-rotate-start));
+    animation: bee-fly-across var(--bee-duration) cubic-bezier(0.22, 0.74, 0.16, 1) forwards;
+}
+
+.rank-bee svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.rank-bee-wing {
+    transform-box: fill-box;
+}
+
+.rank-bee-wing--left {
+    transform-origin: right center;
+    animation: bee-wing-left 0.17s ease-in-out infinite alternate;
+}
+
+.rank-bee-wing--right {
+    transform-origin: left center;
+    animation: bee-wing-right 0.17s ease-in-out infinite alternate;
+}
+
 @keyframes confetti-burst {
     0% {
         opacity: 0;
@@ -88,6 +120,47 @@ body::before {
     100% {
         opacity: 0;
         transform: translate(calc(-50% + var(--end-x)), calc(-50% + var(--end-y))) rotate(var(--rotation)) scale(0.82);
+    }
+}
+
+@keyframes bee-fly-across {
+    0% {
+        opacity: 0;
+        transform: translate3d(-18vw, var(--bee-start-y), 0) scale(var(--bee-scale)) rotate(var(--bee-rotate-start));
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 1;
+        transform: translate3d(52vw, var(--bee-mid-y), 0) scale(var(--bee-scale)) rotate(var(--bee-rotate-mid));
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate3d(116vw, var(--bee-end-y), 0) scale(var(--bee-scale)) rotate(var(--bee-rotate-end));
+    }
+}
+
+@keyframes bee-wing-left {
+    from {
+        transform: rotate(-12deg) translateY(0);
+    }
+
+    to {
+        transform: rotate(8deg) translateY(-2px);
+    }
+}
+
+@keyframes bee-wing-right {
+    from {
+        transform: rotate(12deg) translateY(0);
+    }
+
+    to {
+        transform: rotate(-8deg) translateY(-2px);
     }
 }
 
