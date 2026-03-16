@@ -654,13 +654,14 @@ function renderStats() {
     const currentScore = calculateFoundScore(foundWords, puzzle);
     const pangramsFound = foundWords.filter((word) => isPangram(word, puzzle.letters)).length;
     const totalPangrams = puzzle.words.filter((word) => isPangram(word, puzzle.letters)).length;
+    const pangramsDisplay = `${pangramsFound} / ${totalPangrams}`;
     const progress = totalScore ? Math.round((currentScore / totalScore) * 100) : 0;
     const rankDetails = getNextRankDetails(currentScore, totalScore);
     const rankLadder = getRankLadder(currentScore, totalScore);
 
     elements.wordsFoundValue.textContent = String(foundWords.length);
     elements.scoreValue.textContent = String(currentScore);
-    elements.pangramsValue.textContent = `${pangramsFound} / ${totalPangrams}`;
+    elements.pangramsValue.textContent = pangramsDisplay;
     elements.rankValue.textContent = rankDetails.currentRank;
     elements.scoreMeta.textContent = `${currentScore} of ${totalScore} points`;
     elements.progressPercent.textContent = `${progress}%`;
@@ -684,7 +685,7 @@ function renderStats() {
         elements.mobileFoundCount.textContent = String(foundWords.length);
     }
     if (elements.mobilePangramCount) {
-        elements.mobilePangramCount.textContent = `${pangramsFound} / ${totalPangrams}`;
+        elements.mobilePangramCount.textContent = pangramsDisplay;
     }
     if (elements.mobileUtilityPanel) {
         elements.mobileUtilityPanel.hidden = false;
