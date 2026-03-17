@@ -29,6 +29,7 @@
 
 html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -173,6 +174,7 @@ select {
 
 button {
     cursor: pointer;
+    touch-action: manipulation;
 }
 
 .page-shell {
@@ -1609,6 +1611,13 @@ button.hex-center:focus-visible {
 }
 
 @media (max-width: 760px) {
+    .field input,
+    .field textarea,
+    .field select,
+    .select-trigger {
+        font-size: 16px;
+    }
+
     .page-shell {
         width: min(100% - 20px, 100%);
         margin-top: max(12px, var(--safe-top));
@@ -1662,6 +1671,7 @@ button.hex-center:focus-visible {
     .tab-button {
         flex: 1;
         text-align: center;
+        font-size: 1rem;
     }
 
     .panel-heading {
@@ -1707,7 +1717,7 @@ button.hex-center:focus-visible {
 
     .active-puzzle-note {
         margin: 8px 2px 0;
-        font-size: 0.78rem;
+        font-size: 0.84rem;
     }
 
     #puzzleSelectCurrent {
@@ -1722,6 +1732,7 @@ button.hex-center:focus-visible {
         min-height: 50px;
         padding: 12px 14px;
         border-radius: 18px;
+        font-size: 16px;
     }
 
     .play-tools .subtle-button {
@@ -1731,7 +1742,7 @@ button.hex-center:focus-visible {
         white-space: nowrap;
         justify-content: center;
         text-align: center;
-        font-size: 0.94rem;
+        font-size: 1rem;
         font-weight: 800;
     }
 
@@ -1860,7 +1871,7 @@ button.hex-center:focus-visible {
 
     .tab-button {
         padding: 11px 10px;
-        font-size: 0.94rem;
+        font-size: 1rem;
     }
 
     .stats-grid {
@@ -1879,7 +1890,7 @@ button.hex-center:focus-visible {
         min-width: 136px;
         min-height: 52px;
         padding-inline: 12px;
-        font-size: 0.89rem;
+        font-size: 1rem;
     }
 
     .pangram-chip {
@@ -1938,7 +1949,7 @@ button.hex-center:focus-visible {
 
     .action-button {
         padding: 0 10px;
-        font-size: 0.92rem;
+        font-size: 1rem;
     }
 
     .mobile-utility-panel {
@@ -1954,7 +1965,7 @@ button.hex-center:focus-visible {
 
     .mobile-utility-tab {
         padding: 11px 10px;
-        font-size: 0.94rem;
+        font-size: 1rem;
     }
 
     .mobile-ranking-head {
