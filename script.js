@@ -117,16 +117,16 @@ let beeCleanupTimer = 0;
 let celebrationStateTimer = 0;
 
 const RANKS = [
-    { threshold: 0, label: "Beginner" },
-    { threshold: 0.02, label: "Good Start" },
-    { threshold: 0.05, label: "Moving Up" },
-    { threshold: 0.08, label: "Good" },
-    { threshold: 0.15, label: "Solid" },
-    { threshold: 0.25, label: "Nice" },
-    { threshold: 0.4, label: "Great" },
-    { threshold: 0.5, label: "Amazing" },
-    { threshold: 0.7, label: "Genius" },
-    { threshold: 1, label: "Queen Bee" }
+    { targetScore: 0, label: "Beginner" },
+    { targetScore: 15, label: "Good Start" },
+    { targetScore: 35, label: "Moving Up" },
+    { targetScore: 60, label: "Good" },
+    { targetScore: 100, label: "Solid" },
+    { targetScore: 160, label: "Nice" },
+    { targetScore: 250, label: "Great" },
+    { targetScore: 350, label: "Amazing" },
+    { targetScore: 500, label: "Genius" },
+    { label: "Queen Bee", isQueenBee: true }
 ];
 
 const state = {
@@ -282,16 +282,27 @@ function calculateFoundScore(foundWords, puzzle) {
     return foundWords.reduce((score, word) => score + scoreWord(word, puzzle.letters), 0);
 }
 
+function getRankTargetScore(rank, maxScore) {
+    if (!maxScore) {
+        return 0;
+    }
+
+    if (rank.isQueenBee) {
+        return maxScore;
+    }
+
+    return Math.min(rank.targetScore ?? 0, maxScore);
+}
+
 function getRank(score, maxScore) {
     if (!maxScore) {
         return RANKS[0].label;
     }
 
-    const progress = score / maxScore;
     let currentRank = RANKS[0].label;
 
     RANKS.forEach((rank) => {
-        if (progress >= rank.threshold) {
+        if (score >= getRankTargetScore(rank, maxScore)) {
             currentRank = rank.label;
         }
     });
@@ -308,11 +319,10 @@ function getNextRankDetails(score, maxScore) {
         };
     }
 
-    const progress = score / maxScore;
     let currentIndex = 0;
 
     RANKS.forEach((rank, index) => {
-        if (progress >= rank.threshold) {
+        if (score >= getRankTargetScore(rank, maxScore)) {
             currentIndex = index;
         }
     });
@@ -331,7 +341,7 @@ function getNextRankDetails(score, maxScore) {
     return {
         currentRank,
         nextRank: nextRank.label,
-        pointsToNext: Math.max(0, Math.ceil(nextRank.threshold * maxScore) - score)
+        pointsToNext: Math.max(0, getRankTargetScore(nextRank, maxScore) - score)
     };
 }
 
@@ -346,7 +356,7 @@ function getRankLadder(score, maxScore) {
     }
 
     return RANKS.map((rank, index) => {
-        const targetScore = index === 0 ? 0 : Math.ceil(rank.threshold * maxScore);
+        const targetScore = getRankTargetScore(rank, maxScore);
         const pointsAway = Math.max(0, targetScore - score);
 
         return {
