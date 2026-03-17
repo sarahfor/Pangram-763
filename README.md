@@ -19,6 +19,8 @@ Pangram 763 lets people do two main things:
 - Play built-in pangram puzzles.
 - Create and save custom pangram puzzles in the browser.
 
+This version now uses a Collins Scrabble word list to decide which words are accepted in the game.
+
 While playing, the app keeps track of:
 
 - words found
@@ -35,6 +37,7 @@ It also includes small celebration moments like confetti for pangrams and a larg
 - A running score and rank system.
 - A list of words you have already found.
 - A custom puzzle builder where you can create your own letter set.
+- A Scrabble-style word bank that powers the accepted words.
 - Saved progress in your browser, so your puzzles and scores stay on your device.
 - Mobile-friendly layout for playing on a phone.
 
@@ -58,7 +61,7 @@ On the create screen, the player:
 - chooses the center letter
 - saves the custom puzzle
 
-The site then uses its built-in word list to generate the accepted words for that puzzle.
+The site then uses its current word list to generate the accepted words for that puzzle.
 
 ## Technology Used
 
@@ -70,6 +73,7 @@ This project was built with simple web technologies:
 
 It also uses:
 
+- a Collins Scrabble word list for the current accepted-word bank
 - `localStorage` to save progress and custom puzzles in the browser
 - `GitHub Pages` to publish the website online
 
@@ -81,6 +85,8 @@ The main files are:
 - `styles.css` - the design and responsive layout
 - `script.js` - the game behavior and logic
 - `word-bank.js` - the built-in word list
+- `word-bank-override.js` - the active replacement word list the game uses first
+- `scripts/build-word-bank-override.py` - the helper script for loading a new word list into the game
 
 ## Running It Locally
 
@@ -99,7 +105,7 @@ Then open:
 
 ## Replacing The Word List
 
-If you buy or license a different word list later, the project is now set up for that.
+The project is set up so the word list can be updated later if needed.
 
 Put the new list in a plain text file with one word per line, then run:
 
@@ -111,4 +117,4 @@ That creates `word-bank-override.js`, and the site will use that file instead of
 
 ## Summary
 
-Pangram 763 is a custom word puzzle website where people can both play and create pangram challenges. It was built with HTML, CSS, and JavaScript, and published as a simple browser-based experience that works across devices.
+Pangram 763 is a custom word puzzle website where people can both play and create pangram challenges. It was built with HTML, CSS, and JavaScript, uses a Scrabble-style word list to power accepted words, and is published as a simple browser-based experience that works across devices.

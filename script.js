@@ -84,6 +84,12 @@ const DEFAULT_PUZZLES = [
         title: "Sodilhc",
         letters: ["c", "d", "h", "i", "l", "o", "s"],
         center: "l"
+    },
+    {
+        id: "peanuts-aenpstu",
+        title: "Peanuts",
+        letters: ["a", "e", "n", "p", "s", "t", "u"],
+        center: "n"
     }
 ];
 
