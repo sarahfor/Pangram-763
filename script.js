@@ -87,7 +87,23 @@ const DEFAULT_PUZZLES = [
     }
 ];
 
-const WORD_BANK = Array.isArray(window.PANGRAM763_WORD_BANK) ? window.PANGRAM763_WORD_BANK : [];
+function sanitizeWordBank(rawBank) {
+    if (!Array.isArray(rawBank)) {
+        return [];
+    }
+
+    return [...new Set(
+        rawBank
+            .filter((word) => typeof word === "string")
+            .map((word) => word.trim().toLowerCase())
+            .filter((word) => word.length >= 4 && /^[a-z]+$/.test(word))
+    )];
+}
+
+const BUILT_IN_WORD_BANK = Array.isArray(window.PANGRAM763_WORD_BANK) ? window.PANGRAM763_WORD_BANK : [];
+const OVERRIDE_WORD_BANK = Array.isArray(window.PANGRAM763_WORD_BANK_OVERRIDE) ? window.PANGRAM763_WORD_BANK_OVERRIDE : [];
+const USING_OVERRIDE_WORD_BANK = OVERRIDE_WORD_BANK.length > 0;
+const WORD_BANK = sanitizeWordBank(OVERRIDE_WORD_BANK.length ? OVERRIDE_WORD_BANK : BUILT_IN_WORD_BANK);
 const GENERATED_WORDS_CACHE = new Map();
 const CONFETTI_COLORS = ["#f7cf39", "#171513", "#f29f05", "#ffffff", "#f4d77f"];
 let confettiCleanupTimer = 0;
@@ -201,7 +217,7 @@ function generateWordsForPangram(letters, center) {
         return cachedWords;
     }
 
-    if (CURATED_WORD_SETS[key]) {
+    if (!USING_OVERRIDE_WORD_BANK && CURATED_WORD_SETS[key]) {
         GENERATED_WORDS_CACHE.set(key, CURATED_WORD_SETS[key]);
         return CURATED_WORD_SETS[key];
     }

@@ -97,6 +97,18 @@ Then open:
 
 `http://127.0.0.1:8000`
 
+## Replacing The Word List
+
+If you buy or license a different word list later, the project is now set up for that.
+
+Put the new list in a plain text file with one word per line, then run:
+
+```bash
+python3 scripts/build-word-bank-override.py /path/to/your-word-list.txt
+```
+
+That creates `word-bank-override.js`, and the site will use that file instead of the built-in word bank after a refresh.
+
 ## Summary
 
 Pangram 763 is a custom word puzzle website where people can both play and create pangram challenges. It was built with HTML, CSS, and JavaScript, and published as a simple browser-based experience that works across devices.
