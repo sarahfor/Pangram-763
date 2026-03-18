@@ -472,6 +472,30 @@ function closeRankMenu() {
     renderStats();
 }
 
+function positionRankMenu() {
+    elements.rankDropdown.classList.remove("is-upward");
+    elements.rankMenu.style.maxHeight = "";
+
+    if (!state.rankDetailOpen || elements.rankMenu.hidden) {
+        return;
+    }
+
+    const menuRect = elements.rankMenu.getBoundingClientRect();
+    const cardRect = elements.rankCard.getBoundingClientRect();
+    const viewportPadding = 18;
+    const desiredHeight = Math.min(elements.rankMenu.scrollHeight, window.innerHeight * 0.72, 620);
+    const spaceBelow = window.innerHeight - cardRect.bottom - viewportPadding;
+    const spaceAbove = cardRect.top - viewportPadding;
+
+    if (spaceBelow < desiredHeight && spaceAbove > spaceBelow) {
+        elements.rankDropdown.classList.add("is-upward");
+        elements.rankMenu.style.maxHeight = `${Math.max(220, Math.min(desiredHeight, spaceAbove))}px`;
+        return;
+    }
+
+    elements.rankMenu.style.maxHeight = `${Math.max(220, Math.min(desiredHeight, spaceBelow || desiredHeight))}px`;
+}
+
 function closePuzzleSelectMenu() {
     if (!state.puzzleSelectOpen) {
         return;
@@ -730,6 +754,7 @@ function renderStats() {
     elements.rankMenu.hidden = !state.rankDetailOpen;
     elements.rankDropdown.classList.toggle("is-open", state.rankDetailOpen);
     renderRankBreakdown(elements.rankBreakdown, rankLadder, rankDetails.currentRank);
+    positionRankMenu();
     if (elements.mobileRankMenuCurrent) {
         elements.mobileRankMenuCurrent.textContent = rankDetails.currentRank;
     }
@@ -1372,6 +1397,11 @@ function attachEvents() {
         state.rankDetailOpen = false;
         state.puzzleSelectOpen = false;
         renderTabs();
+    });
+    window.addEventListener("resize", () => {
+        if (state.rankDetailOpen) {
+            positionRankMenu();
+        }
     });
     document.addEventListener("keydown", handleKeyboard);
 }
