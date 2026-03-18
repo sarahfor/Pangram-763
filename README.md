@@ -30,19 +30,6 @@ While playing, the app keeps track of:
 
 It also includes small celebration moments like confetti for pangrams and a larger celebration for Queen Bee.
 
-## Application Features
-
-- A honeycomb-style letter board you can tap or type from the keyboard.
-- A required center letter, just like a spelling puzzle.
-- A running score and rank system.
-- A list of words you have already found.
-- A custom puzzle builder where you can create your own letter set.
-- A Scrabble-style word bank that powers the accepted words.
-- Saved progress in your browser, so your puzzles and scores stay on your device.
-- Mobile-friendly layout for playing on a phone.
-
-## How People Use It
-
 ### Play Pangrams
 
 On the play screen, the player:
