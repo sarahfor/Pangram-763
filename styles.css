@@ -104,6 +104,99 @@ body::before {
     animation: bee-wing-right 0.17s ease-in-out infinite alternate;
 }
 
+.queen-bee-territory-callout {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    pointer-events: none;
+    z-index: 24;
+}
+
+.queen-bee-territory-card {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    justify-items: center;
+    gap: 16px;
+    width: min(460px, calc(100vw - 36px));
+    padding: 28px 28px 24px;
+    border-radius: 34px;
+    border: 1px solid rgba(196, 153, 23, 0.26);
+    background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.88), transparent 52%),
+        linear-gradient(180deg, rgba(255, 252, 244, 0.98), rgba(248, 240, 220, 0.96));
+    box-shadow:
+        0 30px 70px rgba(82, 61, 14, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.84);
+    animation: queen-bee-card-in 0.6s cubic-bezier(0.18, 0.9, 0.32, 1) both;
+}
+
+.queen-bee-territory-card::before {
+    content: "";
+    position: absolute;
+    inset: -14px;
+    border-radius: 40px;
+    background: radial-gradient(circle, rgba(247, 207, 57, 0.18), transparent 68%);
+    z-index: -1;
+}
+
+.queen-bee-territory-figure {
+    width: min(230px, 54vw);
+    filter: drop-shadow(0 20px 28px rgba(55, 40, 10, 0.12));
+}
+
+.queen-bee-territory-figure svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.queen-bee-territory-copy {
+    display: grid;
+    gap: 8px;
+    text-align: center;
+}
+
+.queen-bee-territory-eyebrow {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--info);
+}
+
+.queen-bee-territory-copy strong {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.55rem, 4vw, 2.3rem);
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+}
+
+.queen-bee-wing {
+    transform-box: fill-box;
+}
+
+.queen-bee-wing--left,
+.queen-bee-wing--small-left {
+    transform-origin: right center;
+    animation: queen-bee-wing-left 0.22s ease-in-out infinite alternate;
+}
+
+.queen-bee-wing--right,
+.queen-bee-wing--small-right {
+    transform-origin: left center;
+    animation: queen-bee-wing-right 0.22s ease-in-out infinite alternate;
+}
+
+.queen-bee-crown {
+    transform-origin: center bottom;
+    animation: queen-bee-crown-bob 1.8s ease-in-out infinite;
+}
+
 @keyframes confetti-burst {
     0% {
         opacity: 0;
@@ -162,6 +255,49 @@ body::before {
 
     to {
         transform: rotate(-8deg) translateY(-2px);
+    }
+}
+
+@keyframes queen-bee-card-in {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes queen-bee-wing-left {
+    from {
+        transform: rotate(-10deg) translateY(0);
+    }
+
+    to {
+        transform: rotate(8deg) translateY(-1px);
+    }
+}
+
+@keyframes queen-bee-wing-right {
+    from {
+        transform: rotate(10deg) translateY(0);
+    }
+
+    to {
+        transform: rotate(-8deg) translateY(-1px);
+    }
+}
+
+@keyframes queen-bee-crown-bob {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-3px);
     }
 }
 
@@ -1629,6 +1765,23 @@ button.hex-center:focus-visible {
     transform: translateY(-1px);
 }
 
+.panel-play.is-queen-bee-territory .entry-card {
+    border-color: rgba(226, 179, 0, 0.3);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.84),
+        0 18px 36px rgba(226, 179, 0, 0.16);
+}
+
+.panel-play.is-queen-bee-territory .hex-center {
+    filter: saturate(1.09);
+    transform: translateY(-2px) scale(1.04);
+}
+
+.panel-play.is-queen-bee-territory .status-message.is-success {
+    background: linear-gradient(180deg, rgba(253, 238, 190, 0.98), rgba(249, 229, 164, 0.94));
+    color: #6e5412;
+}
+
 @media (max-width: 1024px) {
     .play-layout,
     .creator-layout {
@@ -1876,14 +2029,32 @@ button.hex-center:focus-visible {
     .field-grid {
         grid-template-columns: 1fr;
     }
+
+    .queen-bee-territory-card {
+        width: min(100%, calc(100vw - 28px));
+        padding: 24px 18px 20px;
+        gap: 12px;
+    }
+
+    .queen-bee-territory-figure {
+        width: min(190px, 58vw);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .reveal,
     .entry-caret,
     .confetti-piece,
+    .queen-bee-territory-card,
+    .queen-bee-wing--left,
+    .queen-bee-wing--right,
+    .queen-bee-wing--small-left,
+    .queen-bee-wing--small-right,
+    .queen-bee-crown,
     .panel-play.is-celebrating .hex-center,
-    .panel-play.is-celebrating .status-message.is-success {
+    .panel-play.is-celebrating .status-message.is-success,
+    .panel-play.is-queen-bee-territory .hex-center,
+    .panel-play.is-queen-bee-territory .status-message.is-success {
         animation: none !important;
         transition: none !important;
         transform: none !important;

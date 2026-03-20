@@ -115,6 +115,8 @@ const CONFETTI_COLORS = ["#f7cf39", "#171513", "#f29f05", "#ffffff", "#f4d77f"];
 let confettiCleanupTimer = 0;
 let beeCleanupTimer = 0;
 let celebrationStateTimer = 0;
+let queenTerritoryCleanupTimer = 0;
+let queenTerritoryStateTimer = 0;
 
 const PLAY_RULE_SUMMARY = "Words must be at least four letters, include the center letter, and may reuse letters. Pangrams use all seven letters and earn 7 bonus points.";
 const CREATOR_RULE_SUMMARY = "Enter seven unique letters and choose the center letter. Accepted words must be at least four letters, include the center letter, and may reuse letters.";
@@ -1040,6 +1042,51 @@ function getBeeSvgMarkup(uniqueId) {
     `;
 }
 
+function getQueenBeeTerritorySvgMarkup(uniqueId) {
+    return `
+        <svg viewBox="0 0 260 280" aria-hidden="true" focusable="false">
+            <defs>
+                <linearGradient id="queenBeeGold${uniqueId}" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#ffdf73" />
+                    <stop offset="100%" stop-color="#e2a900" />
+                </linearGradient>
+            </defs>
+            <g class="queen-bee-crown">
+                <path d="M92 46 108 22 130 50 151 18 168 46 186 28 196 68 64 68 74 28Z" fill="url(#queenBeeGold${uniqueId})" stroke="#181410" stroke-width="7" stroke-linejoin="round" />
+                <path d="M74 68h122v18H74z" fill="#f7cf39" stroke="#181410" stroke-width="7" />
+                <circle cx="108" cy="22" r="7" fill="#67c2ff" stroke="#181410" stroke-width="6" />
+                <circle cx="130" cy="50" r="7" fill="#67c2ff" stroke="#181410" stroke-width="6" />
+                <circle cx="151" cy="18" r="7" fill="#67c2ff" stroke="#181410" stroke-width="6" />
+                <circle cx="186" cy="28" r="7" fill="#67c2ff" stroke="#181410" stroke-width="6" />
+                <circle cx="74" cy="28" r="7" fill="#67c2ff" stroke="#181410" stroke-width="6" />
+            </g>
+            <g class="queen-bee-wing queen-bee-wing--left">
+                <ellipse cx="56" cy="142" rx="42" ry="54" fill="rgba(242,251,255,0.96)" stroke="#181410" stroke-width="7" />
+                <path d="M48 126c10 2 17 8 21 18M38 150c11 1 20 5 28 13" fill="none" stroke="#181410" stroke-width="5" stroke-linecap="round" />
+            </g>
+            <g class="queen-bee-wing queen-bee-wing--right">
+                <ellipse cx="204" cy="142" rx="42" ry="54" fill="rgba(242,251,255,0.96)" stroke="#181410" stroke-width="7" />
+                <path d="M212 126c-10 2-17 8-21 18M222 150c-11 1-20 5-28 13" fill="none" stroke="#181410" stroke-width="5" stroke-linecap="round" />
+            </g>
+            <g class="queen-bee-wing queen-bee-wing--small-left">
+                <ellipse cx="82" cy="192" rx="24" ry="32" fill="rgba(242,251,255,0.96)" stroke="#181410" stroke-width="7" />
+            </g>
+            <g class="queen-bee-wing queen-bee-wing--small-right">
+                <ellipse cx="178" cy="192" rx="24" ry="32" fill="rgba(242,251,255,0.96)" stroke="#181410" stroke-width="7" />
+            </g>
+            <circle cx="130" cy="118" r="54" fill="#ffe07a" stroke="#181410" stroke-width="9" />
+            <circle cx="109" cy="113" r="9" fill="#181410" />
+            <circle cx="151" cy="113" r="9" fill="#181410" />
+            <path d="M109 144c8 8 25 8 34 0" fill="none" stroke="#181410" stroke-width="6" stroke-linecap="round" />
+            <path d="M95 95c5-8 14-12 24-10M141 85c10-2 19 2 24 10" fill="none" stroke="#181410" stroke-width="5" stroke-linecap="round" />
+            <path d="M86 178c0-23 20-41 44-41s44 18 44 41c0 18-9 35-23 46 0 30-21 46-21 46s-21-16-21-46c-14-11-23-28-23-46Z" fill="#181410" />
+            <path d="M92 202c23 10 53 10 76 0" fill="none" stroke="#f7cf39" stroke-width="12" stroke-linecap="round" />
+            <path d="M94 228c22 9 50 9 72 0" fill="none" stroke="#f7cf39" stroke-width="12" stroke-linecap="round" />
+            <path d="M102 254c17 7 39 7 56 0" fill="none" stroke="#f7cf39" stroke-width="12" stroke-linecap="round" />
+        </svg>
+    `;
+}
+
 function flyRankBees(options = {}) {
     if (!elements.effectsLayer) {
         return;
@@ -1094,6 +1141,57 @@ function flyRankBees(options = {}) {
     }, cleanupMs);
 }
 
+function showQueenBeeTerritoryMoment() {
+    if (!elements.effectsLayer || !elements.playPanel) {
+        return;
+    }
+
+    window.clearTimeout(queenTerritoryCleanupTimer);
+    window.clearTimeout(queenTerritoryStateTimer);
+    elements.effectsLayer.querySelectorAll(".queen-bee-territory-callout").forEach((callout) => callout.remove());
+
+    const callout = document.createElement("section");
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    callout.className = "queen-bee-territory-callout";
+    callout.setAttribute("role", "status");
+    callout.setAttribute("aria-live", "polite");
+    callout.innerHTML = `
+        <div class="queen-bee-territory-card">
+            <div class="queen-bee-territory-figure">
+                ${getQueenBeeTerritorySvgMarkup(uniqueId)}
+            </div>
+            <div class="queen-bee-territory-copy">
+                <p class="queen-bee-territory-eyebrow">Queen Bee Territory</p>
+                <strong>You have now entered Queen Bee Territory</strong>
+            </div>
+        </div>
+    `;
+
+    elements.effectsLayer.append(callout);
+    elements.playPanel.classList.add("is-queen-bee-territory");
+
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        burstConfetti({
+            count: 44,
+            spreadX: 320,
+            peakY: 150,
+            endXSpread: 420,
+            endYBase: 120,
+            endYSpread: 180,
+            cleanupMs: 1550,
+            celebrationMs: 1100
+        });
+    }
+
+    queenTerritoryStateTimer = window.setTimeout(() => {
+        elements.playPanel.classList.remove("is-queen-bee-territory");
+    }, 2100);
+
+    queenTerritoryCleanupTimer = window.setTimeout(() => {
+        callout.remove();
+    }, 3000);
+}
+
 function completeSubmission(message, tone, options = {}) {
     state.currentWord = "";
     setStatus(message, tone);
@@ -1105,6 +1203,10 @@ function completeSubmission(message, tone, options = {}) {
 
     if (options.celebrate) {
         burstConfetti(options.confetti);
+    }
+
+    if (options.queenBeeTerritory) {
+        showQueenBeeTerritoryMoment();
     }
 }
 
@@ -1184,6 +1286,14 @@ function submitWord() {
                 celebrationMs: 1300,
                 cleanupMs: 1900
             }
+        });
+        return;
+    }
+
+    if (rankUp && nextRank === "Queen Bee Territory") {
+        completeSubmission("You have now entered Queen Bee Territory", "success", {
+            rankUp,
+            queenBeeTerritory: true
         });
         return;
     }
