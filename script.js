@@ -120,6 +120,7 @@ let queenTerritoryStateTimer = 0;
 
 const PLAY_RULE_SUMMARY = "Words must be at least four letters, include the center letter, and may reuse letters. Pangrams use all seven letters and earn 7 bonus points.";
 const CREATOR_RULE_SUMMARY = "Enter seven unique letters and choose the center letter. Accepted words must be at least four letters, include the center letter, and may reuse letters.";
+const MAX_RANKING_BASE_SCORE = 500;
 
 const RANKS = [
     { percent: 0, label: "Beginner" },
@@ -288,10 +289,20 @@ function calculateFoundScore(foundWords, puzzle) {
     return foundWords.reduce((score, word) => score + scoreWord(word, puzzle.letters), 0);
 }
 
+function getRankingBaseScore(maxScore) {
+    if (!maxScore) {
+        return 0;
+    }
+
+    return Math.min(maxScore, MAX_RANKING_BASE_SCORE);
+}
+
 function getRankTargetScore(rank, maxScore) {
     if (!maxScore) {
         return 0;
     }
+
+    const rankingBase = getRankingBaseScore(maxScore);
 
     if (rank.isQueenBeeTerritory) {
         const geniusRank = RANKS.find((entry) => entry.label === "Genius");
@@ -307,7 +318,7 @@ function getRankTargetScore(rank, maxScore) {
         return 0;
     }
 
-    return Math.min(Math.ceil(maxScore * (rank.percent ?? 0)), maxScore);
+    return Math.min(Math.ceil(rankingBase * (rank.percent ?? 0)), maxScore);
 }
 
 function getRank(score, maxScore) {
