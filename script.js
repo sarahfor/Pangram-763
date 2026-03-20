@@ -116,17 +116,21 @@ let confettiCleanupTimer = 0;
 let beeCleanupTimer = 0;
 let celebrationStateTimer = 0;
 
+const PLAY_RULE_SUMMARY = "Words must be at least four letters, include the center letter, and may reuse letters. Pangrams use all seven letters and earn 7 bonus points.";
+const CREATOR_RULE_SUMMARY = "Enter seven unique letters and choose the center letter. Accepted words must be at least four letters, include the center letter, and may reuse letters.";
+
 const RANKS = [
-    { targetScore: 0, label: "Beginner" },
-    { targetScore: 15, label: "Good Start" },
-    { targetScore: 35, label: "Moving Up" },
-    { targetScore: 60, label: "Good" },
-    { targetScore: 100, label: "Solid" },
-    { targetScore: 160, label: "Nice" },
-    { targetScore: 250, label: "Great" },
-    { targetScore: 350, label: "Amazing" },
-    { targetScore: 500, label: "Genius" },
-    { label: "Queen Bee", isQueenBee: true }
+    { percent: 0, label: "Beginner" },
+    { percent: 0.02, label: "Good Start" },
+    { percent: 0.05, label: "Moving Up" },
+    { percent: 0.08, label: "Good" },
+    { percent: 0.15, label: "Solid" },
+    { percent: 0.25, label: "Nice" },
+    { percent: 0.35, label: "Great" },
+    { percent: 0.45, label: "Amazing" },
+    { percent: 0.6, label: "Genius" },
+    { label: "Queen Bee Territory", isQueenBeeTerritory: true },
+    { percent: 1, label: "Queen Bee", isQueenBee: true }
 ];
 
 const state = {
@@ -287,11 +291,21 @@ function getRankTargetScore(rank, maxScore) {
         return 0;
     }
 
+    if (rank.isQueenBeeTerritory) {
+        const geniusRank = RANKS.find((entry) => entry.label === "Genius");
+        const geniusTarget = geniusRank ? getRankTargetScore(geniusRank, maxScore) : 0;
+        return Math.min(maxScore, geniusTarget + 1);
+    }
+
     if (rank.isQueenBee) {
         return maxScore;
     }
 
-    return Math.min(rank.targetScore ?? 0, maxScore);
+    if ((rank.percent ?? 0) === 0) {
+        return 0;
+    }
+
+    return Math.min(Math.ceil(maxScore * (rank.percent ?? 0)), maxScore);
 }
 
 function getRank(score, maxScore) {
@@ -441,7 +455,7 @@ function setActivePuzzle(puzzleId) {
     state.rankDetailOpen = false;
     state.puzzleSelectOpen = false;
     localStorage.setItem(STORAGE_KEYS.activePuzzle, nextPuzzle.id);
-    setStatus("Every word must use the center letter and stay inside the pangram.", "neutral");
+    setStatus(PLAY_RULE_SUMMARY, "neutral");
     renderPlay();
 }
 
@@ -1223,7 +1237,7 @@ function validateCreatorForm() {
 
 function clearCreatorForm() {
     elements.creatorForm.reset();
-    setCreatorMessage("Enter seven unique letters and choose the center letter.", "neutral");
+    setCreatorMessage(CREATOR_RULE_SUMMARY, "neutral");
 }
 
 function saveCreatorPuzzle(event) {

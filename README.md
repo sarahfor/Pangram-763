@@ -8,7 +8,9 @@ The goal is simple:
 - One letter in the center is required in every word.
 - You can reuse letters.
 - Words must be at least 4 letters long.
-- If you use all 7 letters in one word, that is a pangram.
+- Four-letter words are worth 1 point each.
+- Longer words are worth 1 point per letter.
+- If you use all 7 letters in one word, that is a pangram and it earns an extra 7 points.
 
 This version was designed to feel playful, polished, and easy to use on desktop, iPad, and mobile.
 
@@ -19,7 +21,7 @@ Pangram 763 lets people do two main things:
 - Play built-in pangram puzzles.
 - Create and save custom pangram puzzles in the browser.
 
-This version now uses a Collins Scrabble word list to decide which words are accepted in the game.
+This version now uses a Collins Scrabble word list to decide which words are accepted in the game. The site filters that bank down to lowercase, alphabetic words that are at least 4 letters long, so hyphenated entries are excluded, but the overall list is still broader than a tightly curated editorial Spelling Bee-style dictionary.
 
 While playing, the app keeps track of:
 
