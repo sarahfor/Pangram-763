@@ -1058,64 +1058,71 @@ function getQueenBeeTerritorySvgMarkup(uniqueId) {
     return `
         <svg viewBox="0 0 320 330" aria-hidden="true" focusable="false">
             <defs>
-                <linearGradient id="queenBeeGold${uniqueId}" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#ffe89b" />
-                    <stop offset="100%" stop-color="#d99f00" />
+                <linearGradient id="queenBeeAmber${uniqueId}" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#ffca4b" />
+                    <stop offset="100%" stop-color="#ff9917" />
                 </linearGradient>
-                <radialGradient id="queenBeeFace${uniqueId}" cx="50%" cy="38%" r="70%">
-                    <stop offset="0%" stop-color="#fff3b2" />
-                    <stop offset="100%" stop-color="#ffd96a" />
+                <linearGradient id="queenBeeShell${uniqueId}" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#482635" />
+                    <stop offset="100%" stop-color="#311521" />
+                </linearGradient>
+                <radialGradient id="queenBeeWing${uniqueId}" cx="50%" cy="45%" r="70%">
+                    <stop offset="0%" stop-color="rgba(255,255,255,0.96)" />
+                    <stop offset="100%" stop-color="rgba(243, 237, 247, 0.92)" />
                 </radialGradient>
-                <radialGradient id="queenBeeWing${uniqueId}" cx="50%" cy="40%" r="70%">
-                    <stop offset="0%" stop-color="rgba(255,255,255,0.98)" />
-                    <stop offset="100%" stop-color="rgba(222, 242, 248, 0.94)" />
+                <radialGradient id="queenBeeHighlight${uniqueId}" cx="32%" cy="28%" r="65%">
+                    <stop offset="0%" stop-color="rgba(255,255,255,0.72)" />
+                    <stop offset="100%" stop-color="rgba(255,255,255,0)" />
                 </radialGradient>
             </defs>
             <g class="queen-bee-figure">
-                <g class="queen-bee-antennae" fill="none" stroke="#181410" stroke-width="7" stroke-linecap="round">
-                    <path d="M133 78c-4-22-14-32-25-40" />
-                    <path d="M187 78c4-22 14-32 25-40" />
+                <g class="queen-bee-antennae" fill="none" stroke="#402030" stroke-width="7" stroke-linecap="round">
+                    <path d="M142 84c-3-20-13-31-28-36" />
+                    <path d="M178 84c3-20 13-31 28-36" />
                 </g>
                 <g class="queen-bee-antennae-tips">
-                    <circle cx="106" cy="36" r="8" fill="#181410" />
-                    <circle cx="214" cy="36" r="8" fill="#181410" />
-                </g>
-                <g class="queen-bee-crown">
-                    <path d="M121 78 134 50 160 72 186 46 199 78 224 58 230 102 90 102 96 58Z" fill="url(#queenBeeGold${uniqueId})" stroke="#181410" stroke-width="7" stroke-linejoin="round" />
-                    <path d="M96 102h134v20H96z" fill="#f7cf39" stroke="#181410" stroke-width="7" />
-                    <circle cx="134" cy="50" r="7" fill="#72d2ff" stroke="#181410" stroke-width="6" />
-                    <circle cx="160" cy="72" r="7" fill="#72d2ff" stroke="#181410" stroke-width="6" />
-                    <circle cx="186" cy="46" r="7" fill="#72d2ff" stroke="#181410" stroke-width="6" />
-                    <circle cx="224" cy="58" r="7" fill="#72d2ff" stroke="#181410" stroke-width="6" />
-                    <circle cx="96" cy="58" r="7" fill="#72d2ff" stroke="#181410" stroke-width="6" />
+                    <circle cx="112" cy="47" r="8" fill="#402030" />
+                    <circle cx="208" cy="47" r="8" fill="#402030" />
                 </g>
                 <g class="queen-bee-wing queen-bee-wing--rear-left">
-                    <path d="M97 138c-53-52-108-47-108 1 0 44 44 65 101 52 16-4 31-11 43-21" fill="url(#queenBeeWing${uniqueId})" stroke="#181410" stroke-width="7" stroke-linejoin="round" />
-                    <path d="M42 132c16 4 29 14 38 28M24 168c22 0 38 7 51 18" fill="none" stroke="#181410" stroke-width="5" stroke-linecap="round" />
+                    <path d="M139 126c-49-26-110-29-127 4-16 31 23 57 83 58 27 1 47-6 63-18" fill="url(#queenBeeWing${uniqueId})" stroke="#402030" stroke-width="7" stroke-linejoin="round" />
+                    <path d="M74 126c11 16 29 24 49 24M48 150c16 12 36 16 57 15" fill="none" stroke="#d5c2d3" stroke-width="5" stroke-linecap="round" />
                 </g>
                 <g class="queen-bee-wing queen-bee-wing--rear-right">
-                    <path d="M223 138c53-52 108-47 108 1 0 44-44 65-101 52-16-4-31-11-43-21" fill="url(#queenBeeWing${uniqueId})" stroke="#181410" stroke-width="7" stroke-linejoin="round" />
-                    <path d="M278 132c-16 4-29 14-38 28M296 168c-22 0-38 7-51 18" fill="none" stroke="#181410" stroke-width="5" stroke-linecap="round" />
+                    <path d="M181 126c49-26 110-29 127 4 16 31-23 57-83 58-27 1-47-6-63-18" fill="url(#queenBeeWing${uniqueId})" stroke="#402030" stroke-width="7" stroke-linejoin="round" />
+                    <path d="M246 126c-11 16-29 24-49 24M272 150c-16 12-36 16-57 15" fill="none" stroke="#d5c2d3" stroke-width="5" stroke-linecap="round" />
                 </g>
                 <g class="queen-bee-wing queen-bee-wing--front-left">
-                    <path d="M116 184c-28 7-49 29-46 52 3 24 28 34 57 19 10-5 19-13 26-23" fill="url(#queenBeeWing${uniqueId})" stroke="#181410" stroke-width="7" stroke-linejoin="round" />
+                    <path d="M135 171c-37 7-72 30-71 55 1 22 30 30 63 21 18-6 31-15 43-30" fill="url(#queenBeeWing${uniqueId})" stroke="#402030" stroke-width="7" stroke-linejoin="round" />
                 </g>
                 <g class="queen-bee-wing queen-bee-wing--front-right">
-                    <path d="M204 184c28 7 49 29 46 52-3 24-28 34-57 19-10-5-19-13-26-23" fill="url(#queenBeeWing${uniqueId})" stroke="#181410" stroke-width="7" stroke-linejoin="round" />
+                    <path d="M185 171c37 7 72 30 71 55-1 22-30 30-63 21-18-6-31-15-43-30" fill="url(#queenBeeWing${uniqueId})" stroke="#402030" stroke-width="7" stroke-linejoin="round" />
                 </g>
                 <g class="queen-bee-head">
-                    <circle cx="160" cy="144" r="52" fill="url(#queenBeeFace${uniqueId})" stroke="#181410" stroke-width="8" />
-                    <circle cx="140" cy="140" r="8.5" fill="#181410" />
-                    <circle cx="180" cy="140" r="8.5" fill="#181410" />
-                    <path d="M126 121c7-9 17-13 28-12M166 109c11-1 21 3 28 12" fill="none" stroke="#181410" stroke-width="5" stroke-linecap="round" />
-                    <path d="M142 169c9 10 27 10 36 0" fill="none" stroke="#181410" stroke-width="6" stroke-linecap="round" />
+                    <circle cx="160" cy="110" r="27" fill="url(#queenBeeShell${uniqueId})" />
+                    <circle cx="149" cy="101" r="7" fill="#613347" />
+                    <circle cx="171" cy="101" r="7" fill="#613347" />
+                </g>
+                <g class="queen-bee-thorax">
+                    <ellipse cx="160" cy="153" rx="26" ry="33" fill="url(#queenBeeShell${uniqueId})" />
+                    <ellipse cx="160" cy="154" rx="13" ry="21" fill="#6a3348" opacity="0.9" />
                 </g>
                 <g class="queen-bee-body">
-                    <path d="M113 208c0-25 21-46 47-46s47 21 47 46c0 21-10 39-26 51 0 34-21 54-21 54s-21-20-21-54c-16-12-26-30-26-51Z" fill="#181410" />
-                    <path d="M121 228c25 11 53 11 78 0" fill="none" stroke="#f7cf39" stroke-width="14" stroke-linecap="round" />
-                    <path d="M122 256c24 10 52 10 76 0" fill="none" stroke="#f7cf39" stroke-width="14" stroke-linecap="round" />
-                    <path d="M130 284c18 8 42 8 60 0" fill="none" stroke="#f7cf39" stroke-width="14" stroke-linecap="round" />
-                    <path d="M160 311l-12 16h24z" fill="#181410" />
+                    <path d="M160 177c-29 0-49 27-49 62 0 42 21 77 49 89 28-12 49-47 49-89 0-35-20-62-49-62Z" fill="url(#queenBeeShell${uniqueId})" />
+                    <path d="M128 200c19-11 45-11 64 0 0 0-4 18-11 25h-42c-7-7-11-25-11-25Z" fill="url(#queenBeeAmber${uniqueId})" />
+                    <rect x="120" y="229" width="80" height="22" rx="11" fill="url(#queenBeeAmber${uniqueId})" />
+                    <rect x="125" y="261" width="70" height="22" rx="11" fill="url(#queenBeeAmber${uniqueId})" />
+                    <path d="M160 315l-13 15h26z" fill="#402030" />
+                    <ellipse cx="144" cy="214" rx="16" ry="44" fill="url(#queenBeeHighlight${uniqueId})" opacity="0.46" />
+                    <ellipse cx="178" cy="299" rx="9" ry="12" fill="url(#queenBeeHighlight${uniqueId})" opacity="0.24" />
+                </g>
+                <g class="queen-bee-legs" fill="none" stroke="#402030" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M132 176 112 205 96 203" />
+                    <path d="M128 197 102 232 85 231" />
+                    <path d="M130 222 112 267 97 268" />
+                    <path d="M188 176 208 205 224 203" />
+                    <path d="M192 197 218 232 235 231" />
+                    <path d="M190 222 208 267 223 268" />
                 </g>
             </g>
         </svg>
